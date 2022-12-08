@@ -434,7 +434,6 @@ export class HomeComponent implements AfterViewInit {
       this.bucket.destroyBucket(this.bucket.lastRightClick);
     } else {
       const bucketImages = this.bucket.getImages(this.bucket.lastRightClick);
-      console.log(bucketImages)
       this.modalGallery.openModal(bucketImages);
     }
   }
@@ -446,8 +445,6 @@ export class HomeComponent implements AfterViewInit {
       this.bucket.openUserBucket(this.bucket.lastRightClick);
     } else {
       const bucketImages = this.bucket.getImages(this.bucket.lastRightClick);
-      console.log(bucketImages)
-      console.log(this.bucket.lastRightClick)
       this.modalGallery.openModal(bucketImages);
     }
   }

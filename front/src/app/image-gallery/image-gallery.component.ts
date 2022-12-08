@@ -140,8 +140,6 @@ export class ImageGalleryComponent implements OnInit {
       } else {
         this.items = this.allImages.slice(this.tabsCounter*12, (this.tabsCounter + 1)*12);
       }  
-      console.log(this.selectedIndices)
-      console.log(index)
       this.needRefresh = true; 
     }
   }

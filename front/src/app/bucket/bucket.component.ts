@@ -196,5 +196,10 @@ export class BucketComponent implements OnInit {
         return this.savedBuckets[i].imageUrls;
       }
     }
+    for(let i = 0; i < this.bucketsInUse.length; i++) {
+      if(bucketId == this.bucketsInUse[i].id) {
+        return this.bucketsInUse[i].imageUrls;
+      }
+    }
   }
 }

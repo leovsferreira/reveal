@@ -43,8 +43,6 @@ export class StateService {
       links:  links
     };
     
-    console.log(state)
-    
     const numberOfAddedStates = userData.numberOfAddedStates + 1;
     userData.numberOfAddedStates = numberOfAddedStates;
     userData.states.push(state);
@@ -67,7 +65,7 @@ export class StateService {
     for(let i = 0; i < forceGraphData.links.length; i++) {
       links.push({ source: forceGraphData.links[i].source.id, target: forceGraphData.links[i].target.id});
     }
-    console.log(links)
+
     for(let i = 0; i < userData.states.length; i++) {
       if(userData.states[i].name == name) {
         const state: State =  {
@@ -87,7 +85,6 @@ export class StateService {
   }
 
   async destroyState(stateId: number) {
-    console.log('destroy')
     this.userUid = JSON.parse(localStorage.getItem('user')!).uid;
 
     const userRef: AngularFirestoreDocument<any> = this.afs.doc(
