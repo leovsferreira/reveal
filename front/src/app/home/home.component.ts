@@ -44,7 +44,7 @@ export class HomeComponent implements AfterViewInit {
   public configVisibility = false;
   public inputDisabler = false;
   public draggable = true;
-  public similarityValue = 90;
+  public similarityValue = 80;
   public savedBuckets: any[] = [];
   private rightClickCount: number = 1;
   private ctxMenuSavedBuckets: any = [];

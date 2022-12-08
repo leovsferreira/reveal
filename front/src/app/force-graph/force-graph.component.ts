@@ -4,6 +4,7 @@ import { ApiService } from 'src/app/shared/api.service';
 import { BuildSetQuery } from '../shared/api.models';
 import ForceGraph from 'force-graph';
 import * as d3 from "d3";
+import { thresholdFreedmanDiaconis } from 'd3';
 
 @Component({
   selector: 'app-force-graph',
@@ -55,7 +56,17 @@ export class ForceGraphComponent implements OnInit {
     .onNodeClick((node, event) => {
       if (event.ctrlKey || event.shiftKey || event.altKey) { 
         // multi seleção
-        this.selectedNodes.has(node) ? this.selectedNodes.delete(node) : this.selectedNodes.add(node);
+        if(this.selectedNodes.has(node)) {
+          this.selectedNodes.delete(node)
+        } else {
+          if(this.selectedNodes.size == 2) {
+            const sets = Array.from(this.selectedNodes);
+            sets[1] = node;
+            this.selectedNodes = new Set(sets);
+          } else {
+            this.selectedNodes.add(node);
+          }
+        }
       } else {
         this.parentNode.clear();
         this.parentNode.add(node);
