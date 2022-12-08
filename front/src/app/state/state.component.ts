@@ -28,6 +28,12 @@ export class StateComponent implements OnInit {
     query.then((data:any) => {
       this.savedStates = data;
       setTimeout(() => {  
+        for(let i = 0; i < this.savedStates.length; i++) {
+          if(this.savedStates[i].name == stateName) {
+            const state = this.stateService.getSavedState(this.savedStates[i].id);
+            this.changeStateStatus.emit(state);
+          }
+        }
         this.statesChanged.emit();
         this.spinner.hide();
       },
@@ -38,9 +44,16 @@ export class StateComponent implements OnInit {
   updateState(stateName: string, forceGraphData: any) {
     this.spinner.show();
     const query = this.stateService.updateUserStates(stateName, forceGraphData);
+    
     query.then((data:any) => {
       this.savedStates = data;
       setTimeout(() => {  
+        for(let i = 0; i < this.savedStates.length; i++) {
+          if(this.savedStates[i].name == stateName) {
+            const state = this.stateService.getSavedState(this.savedStates[i].id);
+            this.changeStateStatus.emit(state);
+          }
+        }
         this.statesChanged.emit();
         this.setFy.emit();
         this.spinner.hide();
