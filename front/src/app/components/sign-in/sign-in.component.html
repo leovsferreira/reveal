@@ -1,0 +1,40 @@
+<div class="session-page">
+    <div class="session-container">
+        <div class="session-content">
+            <div class="session-title">
+                <h1 style="color: #808080">Sign in</h1>
+                <div class="form-inputs">
+                    <div class="form-group">
+                        <input type="text" class="form-input" placeholder="Username" #userName required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-input" placeholder="Password" #userPassword required>
+                    </div>
+                </div>
+                <div class="form-actions session-btn">
+                    <button type="button" class="btn" (click)="authService.SignIn(userName.value, userPassword.value)">
+                        Sign in
+                    </button>
+                </div>
+                <div class="form-actions session-btn">
+                    <button  type="button" class="btn-google" (click)="authService.GoogleAuth()">
+                        <div class="google-logo" style="margin-right: 94px;">
+                            <i class="fab fa-google-plus-g"></i>
+                        </div>
+                        Log in with Google
+                    </button>
+                </div>
+                <div style="margin-bottom: 38px; margin-top: 38px;">
+                    <span class="redirect-to-login" style="color: #808080">Forgot Password?
+                        <span class="redirect" style="color: #00AFC1; cursor: pointer;" routerLink="/forgot-password">Recover</span>
+                    </span>
+                </div>
+                <div style="margin-top: 24px;" class="redirect-to-login">
+                    <span style="color: #808080">Don't have an account?
+                        <span class="redirect" style="color: #00AFC1; cursor: pointer;" routerLink="/register-user"> Sign Up</span>
+                    </span>
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>

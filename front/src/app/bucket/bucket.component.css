@@ -1,0 +1,52 @@
+.buckets-row {
+  width: 100%;
+  position: absolute;
+  display: flex;
+  gap: 50px;
+  justify-content: flex-end;
+  right: 77px;
+  bottom: 40px;
+}
+
+.bucket-title {
+  margin-top: 6px;
+  text-align: center;
+  font-size: 14px;
+  margin-left: -20px;
+  font-weight: bold;
+  color: rgba(149, 165, 166, 1) !important;
+  background-color: rgb(238, 238, 238);
+  border-width: 2px;
+  border-color: rgba(149, 165, 166, 1) !important;;
+  border-radius: 5px;
+  border-style: solid;
+  display: inline-block;
+  word-break: break-all;
+  width: 100px;
+}
+
+.bucket-wrapper {
+    z-index:  9999 !important;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .bucket {
+    width: 60px;
+    height: 60px;
+    background-color: rgb(238, 238, 238);
+    border-radius: 30px;
+    padding: 19px 9px 14px 9px;
+    border-width: 2px;
+    border-color: rgba(149, 165, 166, 1) !important;;
+    border-style: solid;
+  }
+
+.bucket:hover, .bucket:active {
+    box-shadow: 0 0px 10px rgb(0 0 0 / 50%);
+}
+

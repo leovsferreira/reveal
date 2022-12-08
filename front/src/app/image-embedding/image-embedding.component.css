@@ -1,0 +1,34 @@
+.btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn{
+	box-shadow: none !important
+}
+
+.btn-custom {
+    color: black;
+    background-color: #fff;
+    outline-color: #fff !important;
+    border-color: #fff !important;
+}
+  
+  
+  .btn-custom:hover {
+    background-color: #eee !important;
+    outline-color: #eee !important;
+    border-color: #eee !important;
+}
+  
+.mode-control {
+    position: absolute;
+    left: 3%;
+    width: 80px;
+    display: flex;
+    border: solid;
+    border-width: 2px;
+    border-radius: 5px;
+    border-color: rgba(218, 223, 225, 0.8) !important;
+    z-index: 2;
+}

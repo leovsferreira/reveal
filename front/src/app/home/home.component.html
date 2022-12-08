@@ -1,0 +1,205 @@
+
+<mat-drawer-container class="example-container" autosize>
+    <mat-drawer #drawer class="example-sidenav" mode="side">
+        <div class="saved-buckets-div" style="margin-left: 10px;">
+            <p>Saved Buckets</p>
+            <div class="saved-buckets-list">
+                <div *ngFor="let bucket of this.bucket.savedBuckets" style="margin-bottom: 10px;">
+                    <div class="bucket-wrapper" id="savedbucket-div-{{bucket.id}}" [attr.data-bucketid]="bucket.id" (contextmenu)="onRightClick(bucket.id, 'bucket')"> 
+                        <div class="bucket">
+                            <span style="color:rgb(0, 175, 193);" class="fas fa-box-open"></span>
+                        </div>
+                        <div class="bucket-title">
+                            {{bucket.id}} - {{bucket.name}}
+                        </div>
+                    </div>
+                    <ul id="contextmenu-savedbucket-{{bucket.id}}"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="saved-states-div" style="margin-left: 10px; margin-top: 10px;">
+            <p>Saved States</p>
+            <div class="saved-states-list">
+                <div *ngFor="let state of this.state.savedStates" style="margin-bottom: 10px;">
+                    <div class="state-wrapper" id="state-div-{{state.id}}" [attr.data-stateid]="state.id" (contextmenu)="onRightClick(state.id, 'state')"> 
+                        <div class="state">
+                            <span style="color:rgb(0, 175, 193);" class="fas fa-square-share-nodes"></span>
+                        </div>
+                        <div class="state-title">
+                            {{state.name}}
+                        </div>
+                        <ul id="contextmenu-state-{{state.id}}"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-drawer>
+    
+    <ngx-spinner size="medium" type="ball-clip-rotate" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
+    
+    <div class="search-bar">
+        <div class="wrap">
+            <button class="log-out" style="width: 39px; margin-left: 12px;" (click)="drawer.toggle()">
+                <span class="fa-solid fa-bars"></span>
+            </button>
+            <button class="log-out" (click)="authService.SignOut()">
+                <i class="fas fa-sign-out-alt"></i>Log out
+            </button>
+            <form class="search" [formGroup]="searchForm" (ngSubmit)="search()">     
+                <div>
+                    <input id="texts" class="searchTerm" type="text" placeholder="{{placeholder}}" formControlName="texts" (ngModelChange)="onTextChange($event)">
+                </div>
+                <input id="images" multiple="" (change)="onFileChange($event)" #fileUpload type="file" id="img" formControlName="images" name="img" accept="image/*" style="display: none;">
+                <button style="border-left: 2px solid rgba(149, 165, 166, 1) !important;" type="button" class="control" (click)="this.toggleConfigVisibility()">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+                <button style="border-left: 2px solid rgba(149, 165, 166, 1) !important;" type="button" class="image-search" (click)="fileUpload.click()">
+                    <i class="far fa-image"></i>
+                </button>
+                <button class="search-button" type="submit">
+                    <i class="fa fa-search"></i>
+                </button>
+            </form>
+
+            <button class="log-out" style="width: 39px; right: 60px; bottom:18px" (click)="openModal(templateState)">
+                <i class="fas fa-floppy-disk fa-xl"></i>
+            </button>
+
+            <button class="log-out" style="width: 39px; right: 12px; bottom:18px" (click)="this.resetAll('reset')">
+                <i class="fas fa-trash"></i>
+            </button>
+            <!--<img *ngFor='let url of images'  [src]="url" height="150" width="200px" style="margin: 3px;"> <br/>-->
+        </div>
+    </div>
+
+    <div #configBox [ngDraggable]="this.draggable" class="widget config-window"
+    [style.z-index] = "this.isConfigVisible() ? '100' : '-100' "
+    >
+    <app-search-config
+        (dragBoxToggled) = "this.toggleDragBoxDrag()"
+        (similarityChanged) = "this.changeSimilarity($event)"
+        (clearEmbeddingsSelection) = "this.onSelectionsClear()"
+    ></app-search-config>
+    </div>
+
+    <div class="visualizations">
+        <div class="embeddings">
+            <div class="embedding" id="image-embedding-div">
+                <app-image-embedding
+                (imageLinkSelected) = "this.linkImagesAndTexts($event)"
+                (clearEmbeddingsSelection) = "this.onSelectionsClear()"
+                (highlightImageGallery) = "this.highlightImageGallery($event)"
+                ></app-image-embedding>
+            </div>
+            <div class="legend">
+                <div class="d3-color-legend">
+                    <app-color-legend></app-color-legend>
+                </div>
+            </div>
+            <div class="embedding" id="text-embedding-div">
+                <app-text-embedding
+                (textLinkSelected) = "this.linkImagesAndTexts($event)"
+                (clearEmbeddingsSelection) = "this.onSelectionsClear()"
+                (highlightWordCloud) = "this.highlightWordCloud($event)"
+                ></app-text-embedding>
+            </div>
+        </div>
+        <div class="infos">
+            <div class="mode-control">
+                <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'gallery' ? '#eee' : '#fff' " type="button" (click)="this.setMode('gallery')">
+                    <span class="fa-solid fa-image"
+                    [style.color]="this.wichModeSelected == 'gallery' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+                </button>
+                <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'cloud' ? '#eee' : '#fff' " type="button" (click)="this.setMode('cloud')">
+                    <span class="fa-solid fa-cloud"
+                    [style.color]="this.wichModeSelected == 'cloud' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+                </button>
+            </div>
+            <div class="gallery" id="gallery-div">
+                <app-image-gallery 
+                [style.visibility]="this.wichModeSelected == 'gallery' ? '' : 'hidden'"
+                [style.display]="this.wichModeSelected == 'gallery' ? 'block' : 'none'"
+                (toggleImage) = "this.toggleEmbeddingImageFromGallery($event)"
+                (gallerySearchSelected)="this.searchSelected($event)"
+                (dropImage) = "this.addImageToBucket($event)">
+                </app-image-gallery>
+                <app-word-cloud [style.visibility]="this.wichModeSelected == 'cloud' ? '' : 'hidden'"
+                (toggleText) = "this.toggleEmbeddingTextFromCloud($event)">
+                </app-word-cloud>
+            </div>
+            <div class="force-graph" id="force-graph-div" style="z-index: 99;">
+                <app-force-graph
+                (embeddingState) = "this.embeddingsToState($event)"
+                (resetAll) = "this.resetAll('reset')"
+                ></app-force-graph>
+            </div>
+        </div>
+        <ul id="contextmenu-text-embedding"></ul>
+        <ul id="contextmenu-image-embedding"></ul>
+        <ul id="contextmenu-force-graph"></ul>
+        <ul id="contextmenu-galleries"></ul>
+    </div>
+    <div class="add-bucket">
+        <button type="button" style="background-color:rgb(238, 238, 238) !important;" class="btn btn-custom" (click)="openModal(templateBucket)">
+            <i style="color: rgb(0, 175, 193);" class="fa-solid fa-plus"></i>
+        </button>   
+    </div>
+
+    <app-bucket
+    (bucketAdded) = "this.setBucketsMenu($event);"
+    (bucketSaved) = "this.setSavedBucketsMenu($event);">
+    </app-bucket>
+    <app-state
+    (statesChanged) = "this.setAllSavedStatesMenu()"
+    (setFy) = "this.setFyToUndefined()"
+    (changeStateStatus) = "this.changeState($event)">
+    </app-state>
+
+    <ng-template #templateBucket>
+        <div class="modal-header">
+            <h1 class="modal-title pull-left" style="color: #808080">New bucket</h1>
+            <button type="button"  class="btn btn-custom" style="background-color:rgb(238, 238, 238) !important;" aria-label="Close" (click)="modalRef.hide()">
+                <i style="color: rgb(0, 175, 193);" class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-inputs">
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="Name" #bucketName required/>
+                </div>
+            </div>
+            <div class="form-actions session-btn">
+                <button type="button" class="btn" (click)="this.onBucketCreate(bucketName.value)">Create</button>
+            </div>
+            <div class="form-actions session-btn">
+                <button type="button" class="btn" style="background-color: #de5246;" (click)="modalRef.hide()">Close</button>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #templateState>
+        <div class="modal-header">
+            <h1 class="modal-title pull-left" style="color: #808080">Save State</h1>
+            <button type="button"  class="btn btn-custom" style="background-color:rgb(238, 238, 238) !important;" aria-label="Close" (click)="modalRef.hide()">
+                <i style="color: rgb(0, 175, 193);" class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-inputs">
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="Name" #stateName required/>
+                </div>
+            </div>
+            <div class="form-actions session-btn">
+                <button type="button" class="btn" (click)="this.onSaveState(stateName.value)">Save</button>
+            </div>
+            <div class="form-actions session-btn">
+                <button type="button" class="btn" style="background-color: #de5246;" (click)="modalRef.hide()">Close</button>
+            </div>
+        </div>
+    </ng-template>
+    <app-model-gallery></app-model-gallery>
+</mat-drawer-container>
+
+
+

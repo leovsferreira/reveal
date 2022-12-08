@@ -1,0 +1,25 @@
+<label for="customRange1" class="form-label">Similarity {{this.textInput}}</label>
+<input #similarityConfig (mousedown)="this.onDragBoxToggle()" (mouseup)="this.onDragBoxToggle()" type="range" value="80" class="form-range" min="70" max="100" step="1" id="customRange1" (change)="updateTextInput(similarityConfig.value)">
+
+<br>
+
+<!--
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="flexRadioControl" id="flexRadioControl1" value="link" checked [disabled]="this.linkInputDisabled" (change)="onLinkChange($event)">
+  <label class="form-check-label" for="flexRadioControl1">
+    Link
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="flexRadioControl" id="flexRadioControl2" value="search" (change)="onLinkChange($event)">
+  <label class="form-check-label" for="flexRadioControl2">
+    Search
+  </label>
+</div>
+<div class="search-selector">
+  <select class="form-select form-select-sm" [disabled]="this.searchSelectorDisabled" (change)="onSearchModeChange($event)">
+    <option value="simple search" selected>Simple search</option>
+    <option value="interserction">Intersection</option>
+  </select>
+</div>
+-->

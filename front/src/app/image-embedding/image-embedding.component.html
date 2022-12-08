@@ -1,0 +1,11 @@
+<div class="mode-control">
+    <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'pan' ? '#eee' : '#fff' " type="button" (click)="this.setMode('pan')">
+        <span class="fa-solid fa-arrow-pointer"
+        [style.color]="this.wichModeSelected == 'pan' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+    </button>
+    <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'area' ? '#eee' : '#fff' " type="button" (click)="this.setMode('area')">
+        <span class="fa-solid fa-vector-square"
+        [style.color]="this.wichModeSelected == 'area' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+    </button>
+</div>
+<div class="fill" id="image-embedding-div" #imageEmbedding></div>

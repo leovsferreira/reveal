@@ -1,0 +1,29 @@
+<ng-template #modalGallery>
+    <div class="modal-header">
+        <h1 class="modal-title pull-left" style="color: #808080">Image gallery</h1>
+        <button type="button"  class="btn btn-custom" style="background-color:rgb(238, 238, 238) !important;" aria-label="Close" (click)="this.closeModal()">
+            <i style="color: rgb(0, 175, 193);" class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div id="modal-gallery">
+            <lightgallery id="lightgallery" [settings]="settings" [onInit]="onInit">
+                <a *ngFor="let item of items" class='grid-item' [attr.href]="item.src"
+                [style.width.px]="item.width"
+                [style.height.px]="item.height">
+                  <img src="{{ item.thumb }}"
+                  [style.width.px]="item.width"
+                  [style.height.px]="item.height"
+                  [style.margin.px]="item.margin"
+                  [style.border-style]="item.border"
+                  [style.border-width]="item.borderWidth"
+                  [style.border-color]="item.borderColor" 
+                  />
+                </a>
+            </lightgallery>
+        </div>
+        <div class="session-btn">
+            <button type="button" class="btn" style="background-color: #de5246;" (click)="this.closeModal()">Close</button>
+        </div>
+    </div>
+</ng-template>

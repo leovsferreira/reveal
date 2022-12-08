@@ -1,0 +1,26 @@
+<button *ngIf="this.hasImages()" [disabled]="!this.hasPrevious()" type="button" style="position: absolute; left: 54%; top: 25%;" class="btn btn-custom" (click)="updateTabCounter(-1)">
+  <i [style.color]="this.hasPrevious() ? 'rgb(0, 175, 193)' : 'rgb(149, 165, 166)'" class="fa-solid fa-arrow-left-long"></i>
+</button> 
+    
+<div id="gallery" oncontextmenu="return false">
+  <lightgallery id="lightgallery" [settings]="settings" [onInit]="onInit">
+    <a *ngFor="let item of items" class='grid-item' [attr.href]="item.src"
+    [style.width.px]="item.width"
+    [style.height.px]="item.height" 
+    (click)="this.onClick($event, item.id, item.index)">
+      <img src="{{ item.thumb }}"
+      [style.width.px]="item.width"
+      [style.height.px]="item.height"
+      [style.margin.px]="item.margin"
+      [style.border-style]="item.border"
+      [style.border-width]="item.borderWidth"
+      [style.border-color]="item.borderColor" 
+      />
+    </a>
+  </lightgallery>
+</div>
+
+<button *ngIf="this.hasImages()" [disabled]="!this.hasNext()" type="button" style="position: absolute; right: 4%; top: 25%;" class="btn btn-custom" (click)="updateTabCounter(1)">
+  <i [style.color]="this.hasNext() ? 'rgb(0, 175, 193)' : 'rgb(149, 165, 166)'"  class="fa-solid fa-arrow-right-long"></i>
+</button> 
+

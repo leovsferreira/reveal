@@ -1,0 +1,7 @@
+back/dataset/
+back/image_tensors.pt
+back/word_tensors.pt
+node_modules/
+package-lock.json
+package.json
+schema.xml

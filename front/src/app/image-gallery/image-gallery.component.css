@@ -1,0 +1,44 @@
+.sim-position {
+    background-color: rgba(0, 0, 0, 0.7);
+    margin-top: -380px;
+    width: 137px;
+    border-radius: 4px;
+}
+
+#gallery {
+    width: 360px; /* Can be in percentage also. */
+    margin: 0 auto;
+}
+
+.btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btn{
+	box-shadow: none !important
+}
+
+.btn-custom{
+    background-color: #eee !important;
+    outline-color: #eee !important;
+    border-color: #eee !important;
+}
+
+.btn-custom:hover {
+    background-color: #fff;
+    outline-color: #fff !important;
+    border-color: #fff !important;
+}
+  
+  
+.btn-custom{
+    background-color: #eee !important;
+    outline-color: #eee !important;
+    border-color: #eee !important;
+}
+
+.btn:active {
+    transform: translateY(2px);
+    filter: saturate(150%);
+}
