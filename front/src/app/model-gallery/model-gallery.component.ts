@@ -47,7 +47,7 @@ export class ModelGalleryComponent implements OnInit {
                        borderWidth:'0px'});
     }
 
-    this.modalRef = this.modalService.show(this.modalGallery);
+    this.modalRef = this.modalService.show(this.modalGallery, {class: 'modal-lg'});
   }
 
   onInit = (detail:any): void => {

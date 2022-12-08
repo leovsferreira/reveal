@@ -1,6 +1,6 @@
-::ng-deep .modal-dialog {
-    max-width: 98% !important;
-    max-height: 98% !important;
+::ng-deep .modal-lg {
+    max-width: 93% !important;
+    max-height: 93% !important;
     margin: 0.75rem auto !important;
 }
 
