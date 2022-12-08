@@ -151,6 +151,7 @@ def get_state():
     images = images.iloc[image_ids, :]
     texts = texts.iloc[text_ids, :]
     # building images and word data
+    image_index = images.index.tolist()
     images = images.to_numpy()
     image_coords = images[:, [2,3]].tolist()
     image_path = images[:, [0]].tolist()
@@ -164,8 +165,9 @@ def get_state():
         text_int_list = [int(x) for x in text_string_list]
         text_ids.append(text_int_list)
 
-    image_data = {"similarities": im_sim, "labels":image_ids,"projection": image_coords,"labelPaths":image_path, "numberOfImages": len(image_ids), "textIds": text_ids, "similarityValue": parameters['similarityValue']/100 }
+    image_data = {"similarities": im_sim, "labels":image_index,"projection": image_coords,"labelPaths":image_path, "numberOfImages": len(image_index), "textIds": text_ids, "similarityValue": parameters['similarityValue']/100 }
     
+    word_index = texts.index.tolist()
     unique_texts = texts.to_numpy()
     word_coords = unique_texts[:, [2,3]].tolist()
     word_labels = unique_texts[:, [0]].tolist()
@@ -179,7 +181,7 @@ def get_state():
         image_int_list = [int(x) for x in image_string_list]
         image_ids.append(image_int_list)
 
-    word_data = {"similarities": wo_sim,"labels": text_ids ,"labelNames":word_labels, "numberOfTexts": len(text_ids),"projection":word_coords, "imageIds": image_ids, "imageIndices": image_ids, "similarityValue": parameters['similarityValue'] / 100 }
+    word_data = {"similarities": wo_sim,"labels": word_index ,"labelNames":word_labels, "numberOfTexts": len(word_index),"projection":word_coords, "imageIds": image_ids, "imageIndices": image_index, "similarityValue": parameters['similarityValue'] / 100 }
     return jsonify({'texts': word_data, 'images':image_data})
 
 #build new set
