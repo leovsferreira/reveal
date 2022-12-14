@@ -1,19 +1,15 @@
-import clip
-from matplotlib.pyplot import text
+import open_clip
 import torch
 import re
 import base64
 from PIL import Image
-import PIL
 from io import BytesIO
 import numpy as np
-from sklearn import preprocessing
 import pandas as pd
+from multilingual_clip import pt_multilingual_clip
+from transformers import AutoTokenizer
 
-def build_tensors(parameters, query_type):
-    #seta device e chama o modelo do clip
-    device = "cpu" if torch.cuda.is_available() else "cpu"
-    model, preprocess = clip.load('ViT-B/32', device)
+def build_tensors(parameters, query_type, device, image_encoder, image_preprocess, text_encoder, text_tokenizer):
     #textos e imagens provenientes da query
     texts = parameters['textsQuery']
     images = parameters['imagesQuery']
@@ -24,44 +20,42 @@ def build_tensors(parameters, query_type):
     images_list = []
     #lida com os textos
     if query_type == 0:
-        texts_tensors = build_texts_tensors(texts, device, model)
+        texts_tensors = build_texts_tensors(texts, text_encoder, text_tokenizer)
         texts_tensors /= texts_tensors.norm(dim=-1, keepdim=True)
         return texts_tensors
     #lida com as imagens
     elif query_type == 1:
         if from_where == 'searchbar':
-            images_tensors = build_images_tensors(images, device, model, preprocess, from_where)
+            images_tensors = build_images_tensors(images, device, image_encoder, image_preprocess, from_where)
             images_tensors /= images_tensors.norm(dim=-1, keepdim=True)
         else:
             for image_path in images:
                 image = Image.open(image_path)
                 images_list.append(image)
-            images_tensors = build_images_tensors(images_list, device, model, preprocess, from_where)
+            images_tensors = build_images_tensors(images_list, device, image_encoder, image_preprocess, from_where)
             images_tensors /= images_tensors.norm(dim=-1, keepdim=True)
         return images_tensors
     #lida com as imagens e os textos
     elif query_type == 2:
-        texts_tensors = build_texts_tensors(texts, device, model)
+        texts_tensors = build_texts_tensors(texts, text_encoder, text_tokenizer)
         texts_tensors /= texts_tensors.norm(dim=-1, keepdim=True)
         if from_where == 'searchbar':
-            images_tensors = build_images_tensors(images, device, model, preprocess, from_where)
+            images_tensors = build_images_tensors(images, device, image_encoder, image_preprocess, from_where)
             images_tensors /= images_tensors.norm(dim=-1, keepdim=True)
             #junta os tensores de imagens e textos
         else:
             for image_path in images:
                 image = Image.open(image_path)
                 images_list.append(image)
-            images_tensors = build_images_tensors(images_list, device, model, preprocess, from_where)
+            images_tensors = build_images_tensors(images_list, device, image_encoder, image_preprocess, from_where)
             images_tensors /= images_tensors.norm(dim=-1, keepdim=True)
         return texts_tensors, images_tensors
 
 #constroi tensores de textos
-def build_texts_tensors(texts, device, model):
-    texts_tensors = clip.tokenize(texts).to(device)
+def build_texts_tensors(texts, model, tokenizer):
     with torch.no_grad():
-        texts_tensors = model.encode_text(texts_tensors)
-    return texts_tensors
-
+        word_feature = model.forward(texts, tokenizer)
+    return word_feature
 #constroi tensores de imagens
 def build_images_tensors(images, device, model, preprocess, from_where):
     images_tensors = []
@@ -70,7 +64,8 @@ def build_images_tensors(images, device, model, preprocess, from_where):
             image_data = re.sub('^data:image/.+;base64,', '', image)
             image = Image.open(BytesIO(base64.b64decode(image_data)))
             image_tensor = preprocess(image).unsqueeze(0).to(device)
-            image_tensor = model.encode_image(image_tensor)
+            with torch.no_grad():
+                image_tensor = model.encode_image(image_tensor)
             images_tensors.append(image_tensor)
         #junta todos os tensores de imagens em um único tensor
         images_tensors = torch.cat(images_tensors,dim=0)
@@ -78,7 +73,8 @@ def build_images_tensors(images, device, model, preprocess, from_where):
     else:
         for image in images:
             image_tensor = preprocess(image).unsqueeze(0).to(device)
-            image_tensor = model.encode_image(image_tensor)
+            with torch.no_grad():
+                image_tensor = model.encode_image(image_tensor)
             images_tensors.append(image_tensor)
         #junta todos os tensores de imagens em um único tensor
         images_tensors = torch.cat(images_tensors,dim=0)
@@ -137,6 +133,25 @@ def get_indices(similarities_lists, similarity_value):
     
 def column(matrix, i):
     return [row[i] for row in matrix]
+
+def build_image_encoder():
+    device = get_torch_device()
+    model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-16-plus-240', pretrained="laion400m_e32")
+    model.to(device)
+    return model, preprocess
+
+def build_text_encoder():
+    model_name = 'M-CLIP/XLM-Roberta-Large-Vit-B-16Plus'
+    model = pt_multilingual_clip.MultilingualCLIP.from_pretrained(model_name)
+    return model
+
+def build_text_tokenizer():
+    model_name = 'M-CLIP/XLM-Roberta-Large-Vit-B-16Plus'
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    return tokenizer
+
+def get_torch_device():
+    return "cpu"
 """
 def choose_query_based_on_origin(parameters, query_type, images):
     if 'query' in parameters:
