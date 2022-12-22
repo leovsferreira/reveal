@@ -1,47 +1,57 @@
 from enum import unique
 from flask import Flask, jsonify, request
-import clip
-from itsdangerous import exc
 import torch
 import pandas as pd
 import numpy as np
 from flask_cors import CORS
-import base64
-from PIL import Image
-import PIL
-from io import BytesIO
-import math
-from utils import calculate_similarities, get_indices, build_tensors, normalize_similarities
-import json
+from utils import build_text_tokenizer, calculate_similarities, get_indices, build_tensors, get_torch_device, normalize_similarities, build_image_encoder, build_text_encoder
 from itertools import chain
+from flask import current_app
 
 # declare constants
 HOST = '0.0.0.0'
 PORT = 8081
 # initialize flask application
 app = Flask(__name__)
+app.image_encoder, app.image_preprocess = build_image_encoder()
+app.text_encoder = build_text_encoder()
+app.text_tokenizer = build_text_tokenizer()
+app.torch_device = get_torch_device()
+
 CORS(app)
 @app.route('/api/search', methods=['POST'])
 def search():
     # get parameters from request
     parameters = request.get_json()
     # reading datasets
-    images = pd.read_csv('images.csv', index_col="Unnamed: 0")
-    unique_texts = pd.read_csv('unique_texts.csv', index_col="Unnamed: 0")
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
+    unique_texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
     # load image embedding
-    image_embedding = torch.load('image_tensors.pt', map_location=torch.device('cpu'))
+    image_embedding = torch.load('multi_clip_image_tensors.pt', map_location=torch.device('cpu'))
     # load word embedding
-    word_embedding = torch.load('word_tensors.pt', map_location=torch.device('cpu'))
+    word_embedding = torch.load('multi_clip_word_tensors.pt', map_location=torch.device('cpu'))
 
     query_type = parameters['queryType']
     similarity_value = parameters['similarityValue'] / 100
     #constroi os tensores baseado nos dados provenientes da query
     tensors = []
     if query_type == 2:
-        texts_tensors, images_tensors = build_tensors(parameters, query_type)
+        texts_tensors, images_tensors = build_tensors(parameters,
+                                                      query_type, 
+                                                      current_app.torch_device, 
+                                                      current_app.image_encoder,
+                                                      current_app.image_preprocess,  
+                                                      current_app.text_encoder,
+                                                      current_app.text_tokenizer)
         tensors = [texts_tensors, images_tensors]
     else:
-        tensors = build_tensors(parameters, query_type)
+        tensors = build_tensors(parameters,
+                                query_type, 
+                                current_app.torch_device, 
+                                current_app.image_encoder,
+                                current_app.image_preprocess,  
+                                current_app.text_encoder,
+                                current_app.text_tokenizer)
     #calcula similaridades individualmente para imagens e para textos
     similarities = calculate_similarities(tensors, image_embedding, word_embedding, query_type)
     #normaliza a similaridade dos textos caso tenha texto na query
@@ -135,8 +145,8 @@ def search():
 def get_state():
     parameters = request.get_json()
     # reading datasets
-    images = pd.read_csv('images.csv', index_col="Unnamed: 0")
-    texts = pd.read_csv('unique_texts.csv', index_col="Unnamed: 0")
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
+    texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
     image_ids = parameters['imagesIds']
     text_ids = parameters['textsIds']
     if len(np.shape(parameters["imagesSimilarities"])) > 1:
