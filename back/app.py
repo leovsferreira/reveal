@@ -21,6 +21,7 @@ app.torch_device = get_torch_device()
 CORS(app)
 @app.route('/api/search', methods=['POST'])
 def search():
+    #
     # get parameters from request
     parameters = request.get_json()
     # reading datasets
