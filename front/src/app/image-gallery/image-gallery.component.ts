@@ -46,6 +46,7 @@ export class ImageGalleryComponent implements OnInit {
       for(let i = 0; i < images.length; i++) { 
         images[i].addEventListener('dragend', (event:any) => {
           this.draggedImageUrl = event.target.src.replace('http://localhost:4200','.')
+          console.log(this.draggedImageUrl)
           this.dropImage.emit(this.draggedImageUrl);
         });
       }
@@ -66,7 +67,7 @@ export class ImageGalleryComponent implements OnInit {
     const paths = data.labelPaths;
     const ids = data.labels;
     for(let i = 0; i < paths.length; i++) {
-      this.allImages.push({src: `https://storage.googleapis.com/pm2023/art/images/${paths[i]}`,
+      this.allImages.push({src: `https://storage.googleapis.com/pm2023/art/paintings/${paths[i]}`,
                        thumb: `https://storage.googleapis.com/pm2023/art/thumbnails/${paths[i]}`, 
                        id: ids[i], 
                        index: i, 
