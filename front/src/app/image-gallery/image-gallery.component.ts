@@ -66,8 +66,8 @@ export class ImageGalleryComponent implements OnInit {
     const paths = data.labelPaths;
     const ids = data.labels;
     for(let i = 0; i < paths.length; i++) {
-      this.allImages.push({src: `https://storage.googleapis.com/pm2023/images/${paths[i]}`,
-                       thumb: `https://storage.googleapis.com/pm2023/thumbnails/${paths[i]}`, 
+      this.allImages.push({src: `https://storage.googleapis.com/pm2023/art/images/${paths[i]}`,
+                       thumb: `https://storage.googleapis.com/pm2023/art/thumbnails/${paths[i]}`, 
                        id: ids[i], 
                        index: i, 
                        width: 93, 

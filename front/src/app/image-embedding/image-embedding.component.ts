@@ -78,7 +78,7 @@ export class ImageEmbeddingComponent implements OnInit {
               theme: 'translucent'
             });
             this.tooltip.setProps({
-              content: `<img style="max-width: 128px; max-height: 128px;" src="https://storage.googleapis.com/pm2023/images/${imagePath}"></img>`,
+              content: `<img style="max-width: 128px; max-height: 128px;" src="https://storage.googleapis.com/pm2023/art/images/${imagePath}"></img>`,
               allowHTML: true,
               getReferenceClientRect: () => ({
                 width: 0,
