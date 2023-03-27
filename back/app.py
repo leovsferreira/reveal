@@ -108,6 +108,7 @@ def search():
     images = images.to_numpy()
     image_coords = images[:, [2,3]].tolist()
     image_path = images[:, [0]].tolist()
+    print(images[:, [4]].tolist())
     images_sim = list(chain.from_iterable(images[:, [4]].tolist()))
     text_ids = []
 
