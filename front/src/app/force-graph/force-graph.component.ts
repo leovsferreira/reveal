@@ -190,52 +190,59 @@ export class ForceGraphComponent implements OnInit {
   }
 
   removeNode() {
-    const idNodeList: any = [];
-    this.selectedNodes.forEach((node: any) => {
-      //refaz lista somente com nós que não foram deletados
-      const indexNode = this.forceGraphData.nodes.indexOf(node);
-      if (indexNode > -1) { 
-        idNodeList.push(node.id)
-        this.forceGraphData.nodes.splice(indexNode, 1);
-      }
-    });
+    if(this.selectedNodes.size > 1) {
+      alert("Para deletar, selecione apenas um nó");
+    } else {
+      const idNodeList: any = [];
+      this.selectedNodes.forEach((node: any) => {
+        //refaz lista somente com nós que não foram deletados
+        const indexNode = this.forceGraphData.nodes.indexOf(node);
+        if (indexNode > -1) { 
+          idNodeList.push(node.id)
+          this.forceGraphData.nodes.splice(indexNode, 1);
+        }
+      });
+      console.log(idNodeList)
+      console.log(this.forceGraphData.links)
+      //refaz lista somente com links que não foram deletados
+      const newLinksList: any = [];
+      for(let i = 0; i < idNodeList.length; i++) {
 
-    //refaz lista somente com links que não foram deletados
-    const newLinksList: any = [];
-    for(let i = 0; i < this.forceGraphData.links.length; i++) {
-      const sourceNodeId = this.forceGraphData.links[i].source;
-      const targetNodeId = this.forceGraphData.links[i].target;
-      for(let j = 0; j < idNodeList.length; j++) {
-        if(sourceNodeId == idNodeList[j] || targetNodeId == idNodeList[j]) {
-          this.forceGraphData.links.splice(i, 1);
+        for(let j = 0;j < this.forceGraphData.links.length;j++) {
+          const sourceNodeId = this.forceGraphData.links[j].source.id;
+          const targetNodeId = this.forceGraphData.links[j].target.id;
+          if(sourceNodeId !== idNodeList[i] && targetNodeId !== idNodeList[i]) {
+            newLinksList.push(this.forceGraphData.links[j])
+          }
         }
       }
+
+      this.forceGraphData.links = newLinksList;
+      console.log(this.forceGraphData.links)
+      //seta novo dado para renderizar no grafo
+      this.forceGraph.graphData(this.forceGraphData);
+      this.selectedNodes.clear();
+      //seta parent node para o último criado antes de deeletar
+      this.parentNode.clear();
+
+      /**
+       * TODO:
+       * RESETAR TODAS AS VIEW SE TODOS OS NÓS FOREM DELETADOS
+       */
+      if(this.forceGraphData.nodes.length > 0) {
+        const node = this.forceGraphData.nodes[this.forceGraphData.nodes.length - 1]
+        this.parentNode.add(node);
+        //muda o estado da interface para ultimo no criado antes de deletar
+        this.currentMainNode = node;
+        this.embeddingState.emit([this.currentMainNode.imagesIds,
+                                  this.currentMainNode.imagesSimilarities, 
+                                  this.currentMainNode.textsIds, 
+                                  this.currentMainNode.textsSimilarities]);
+      } else {
+        this.embeddingState.emit([]);
+      };
     }
-
-    this.forceGraphData.links = newLinksList;
-    //seta novo dado para renderizar no grafo
-    this.forceGraph.graphData(this.forceGraphData);
-    this.selectedNodes.clear();
-    //seta parent node para o último criado antes de deeletar
-    this.parentNode.clear();
-    /**
-     * TODO:
-     * RESETAR TODAS AS VIEW SE TODOS OS NÓS FOREM DELETADOS
-     */
-    if(this.forceGraphData.nodes.length > 0) {
-      const node = this.forceGraphData.nodes[this.forceGraphData.nodes.length - 1]
-      this.parentNode.add(node);
-      //muda o estado da interface para ultimo no criado antes de deletar
-      this.currentMainNode = node;
-      this.embeddingState.emit([this.currentMainNode.imagesIds,
-                                this.currentMainNode.imagesSimilarities, 
-                                this.currentMainNode.textsIds, 
-                                this.currentMainNode.textsSimilarities]);
-    } else {
-      this.embeddingState.emit([]);
-    };
-
-  }  
+  }
 
   buildNewNode(type: string, nodes: any) {
     //adiciona informações
@@ -395,12 +402,13 @@ export class ForceGraphComponent implements OnInit {
   }
 
   buildTooltip(node: any, queryType: number) {
+    console.log(node.imagesQuery)
     let str = `<b>Query num ${node.id + 1}:</b><br>`;
     if(queryType == 0) for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
-    else if(queryType == 1 || queryType == 4) for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset', 'https://storage.googleapis.com/pm2023')}"></img>`;
+    else if(queryType == 1 || queryType == 4) for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/arts_images', 'https://storage.googleapis.com/pm2023/art/paintings')}"></img>`;
     else {
       for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
-      for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset', 'https://storage.googleapis.com/pm2023')}"></img>`;
+      for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/arts_images', 'https://storage.googleapis.com/pm2023/art/paintings')}"></img>`;
     }
     return str
   }
