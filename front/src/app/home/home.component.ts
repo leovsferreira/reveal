@@ -373,7 +373,7 @@ export class HomeComponent implements AfterViewInit {
     if(selectedImagesIds.length > 0) {
       for(let i = 0; i < selectedImagesIds.length; i++) {
         imageIndices.push(this.imageEmbedding.dataset.metadata[selectedImagesIds[i]].labelIndex);
-        imageLabels.push(`dataset/images/${this.imageEmbedding.dataset.labelPaths[selectedImagesIds[i]][0]}`);
+        imageLabels.push(`dataset/arts_images/${this.imageEmbedding.dataset.labelPaths[selectedImagesIds[i]][0]}`);
       };
     }
 
@@ -433,7 +433,7 @@ export class HomeComponent implements AfterViewInit {
     } else if(args.item.id == 'delete') {
       this.bucket.destroyBucket(this.bucket.lastRightClick);
     } else {
-      const bucketImages = this.bucket.getImages(this.bucket.lastRightClick);
+      const bucketImages = this.bucket.getImages(this.bucket.lastRightClick,'inuse');
       this.modalGallery.openModal(bucketImages);
     }
   }
@@ -444,8 +444,12 @@ export class HomeComponent implements AfterViewInit {
     } else if(args.item.id == 'open') {
       this.bucket.openUserBucket(this.bucket.lastRightClick);
     } else {
-      const bucketImages = this.bucket.getImages(this.bucket.lastRightClick);
-      this.modalGallery.openModal(bucketImages);
+      if(!this.modalGallery.isModalOpen) {
+        const bucketImages = this.bucket.getImages(this.bucket.lastRightClick, 'saved');
+        this.modalGallery.openModal(bucketImages);        
+      } else {
+        console.log('modal already open')
+      }
     }
   }
 
@@ -577,6 +581,8 @@ export class HomeComponent implements AfterViewInit {
   }
 
   addImageToBucket(event: any) {
+    console.log(event)
+    console.log(this.imageGallery.selectedIndices)
     if(this.bucket.bucketToDrop !== -1) {
       if(this.imageGallery.selectedIndices.length > 0) {
         for(let i = 0; i < this.imageGallery.selectedImagePaths.length; i++) {

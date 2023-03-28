@@ -190,15 +190,18 @@ export class BucketComponent implements OnInit {
     }
   }
 
-  getImages(bucketId: number) {
-    for(let i = 0; i < this.savedBuckets.length; i++) {
-      if(bucketId == this.savedBuckets[i].id) {
-        return this.savedBuckets[i].imageUrls;
+  getImages(bucketId: number, from: string) {
+    if(from == "saved") {
+      for(let i = 0; i < this.savedBuckets.length; i++) {
+        if(bucketId == this.savedBuckets[i].id) {
+          return this.savedBuckets[i].imageUrls;
+        }
       }
-    }
-    for(let i = 0; i < this.bucketsInUse.length; i++) {
-      if(bucketId == this.bucketsInUse[i].id) {
-        return this.bucketsInUse[i].imageUrls;
+    } else {
+      for(let i = 0; i < this.bucketsInUse.length; i++) {
+        if(bucketId == this.bucketsInUse[i].id) {
+          return this.bucketsInUse[i].imageUrls;
+        }
       }
     }
   }
