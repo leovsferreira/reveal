@@ -15,6 +15,7 @@ export class ModelGalleryComponent implements OnInit {
   public modalRef: BsModalRef = new BsModalRef;
   private lightGallery!: LightGallery;
   public items:any = [];
+  public isModalOpen:any = false;
   private needRefresh = false;
   public settings = {
     counter: false,
@@ -48,6 +49,7 @@ export class ModelGalleryComponent implements OnInit {
     }
 
     this.modalRef = this.modalService.show(this.modalGallery, {class: 'modal-lg'});
+    this.isModalOpen = true;
   }
 
   onInit = (detail:any): void => {
@@ -56,6 +58,7 @@ export class ModelGalleryComponent implements OnInit {
 
   closeModal() {
     this.items = [];
+    this.isModalOpen = false;
     this.modalRef.hide();
   }
 
