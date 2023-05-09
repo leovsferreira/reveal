@@ -5,9 +5,9 @@ import { Query, StateQuery, BuildSetQuery } from "./api.models";
 @Injectable()
 export class ApiService {
     // xhttp urls
-    xhttp_url_search: string = 'http://localhost:8081/api/search';
-    xhttp_url_state: string = 'http://localhost:8081/api/state';
-    xhttp_url_build_set: string = 'http://localhost:8081/api/build_set';
+    xhttp_url_search: string = 'http://localhost:8001/api/search';
+    xhttp_url_state: string = 'http://localhost:8001/api/state';
+    xhttp_url_build_set: string = 'http://localhost:8001/api/build_set';
 
     constructor() { }
 

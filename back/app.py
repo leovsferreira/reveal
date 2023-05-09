@@ -10,7 +10,7 @@ from flask import current_app
 
 # declare constants
 HOST = '0.0.0.0'
-PORT = 8081
+PORT = 8001
 # initialize flask application
 app = Flask(__name__)
 app.image_encoder, app.image_preprocess = build_image_encoder()
