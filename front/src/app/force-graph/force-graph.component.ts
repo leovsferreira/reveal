@@ -405,10 +405,10 @@ export class ForceGraphComponent implements OnInit {
     console.log(node.imagesQuery)
     let str = `<b>Query num ${node.id + 1}:</b><br>`;
     if(queryType == 0) for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
-    else if(queryType == 1 || queryType == 4) for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/arts_images', 'https://storage.googleapis.com/pm2023/art/paintings')}"></img>`;
+    else if(queryType == 1 || queryType == 4) for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images', 'https://storage.googleapis.com/pm2023/images')}"></img>`;
     else {
       for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
-      for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/arts_images', 'https://storage.googleapis.com/pm2023/art/paintings')}"></img>`;
+      for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images', 'https://storage.googleapis.com/pm2023/images')}"></img>`;
     }
     return str
   }

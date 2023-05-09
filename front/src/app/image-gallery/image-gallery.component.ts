@@ -81,7 +81,7 @@ export class ImageGalleryComponent implements OnInit {
     this.items = this.allImages.slice(0, 12);
 
     this.needRefresh = true;
-
+    console.log(this.items)
   }
 
   gallerySearch() {
