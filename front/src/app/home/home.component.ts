@@ -149,7 +149,7 @@ export class HomeComponent implements AfterViewInit {
       const Galleries: ContextMenu = new ContextMenu(menuOptionsGalleries, '#contextmenu-galleries')
 
       setTimeout(() => {  
-        this.setAllBucketsMenu();
+        this.setAllBucketsMenu("first load");
         this.setAllSavedStatesMenu();
         this.spinner.hide();
       },
@@ -531,10 +531,13 @@ export class HomeComponent implements AfterViewInit {
   }
 
 
-  setAllBucketsMenu() {
-    for(let i = 0; i < this.bucket.bucketsInUse.length;  i++) {
-      this.setBucketsMenu(this.bucket.bucketsInUse[i].id);
+  setAllBucketsMenu(from: string) {
+    if(from !== 'saving') {
+      for(let i = 0; i < this.bucket.bucketsInUse.length;  i++) {
+        this.setBucketsMenu(this.bucket.bucketsInUse[i].id);
+      }
     }
+
     for(let i = 0; i < this.bucket.savedBuckets.length;  i++) {
       this.setSavedBucketsMenu(this.bucket.savedBuckets[i].id)
     }
