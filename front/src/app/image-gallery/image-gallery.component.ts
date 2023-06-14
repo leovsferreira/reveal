@@ -62,6 +62,7 @@ export class ImageGalleryComponent implements OnInit {
     this.allImages = [];
     this.items = [];
     this.selectedIndices = [];
+    this.selectedImagePaths = [];
 
     const similarities = data.similarities;
     const paths = data.labelPaths;
@@ -147,6 +148,8 @@ export class ImageGalleryComponent implements OnInit {
 
   selectImages(points: any) {
     this.selectedIndices = [];
+    this.selectedImagePaths = [];
+
     for(let i = 0; i < this.allImages.length; i++) {
       this.allImages[i].border = 'none';
       this.allImages[i].borderColor = "";
