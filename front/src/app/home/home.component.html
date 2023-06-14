@@ -147,7 +147,7 @@
 
     <app-bucket
     (bucketAdded) = "this.setBucketsMenu($event);"
-    (bucketSaved) = "this.setSavedBucketsMenu($event);">
+    (bucketSaved) = "setAllBucketsMenu();">
     </app-bucket>
     <app-state
     (statesChanged) = "this.setAllSavedStatesMenu()"
