@@ -45,7 +45,7 @@ export class BucketComponent implements OnInit {
       this.userBuckets = data;
       this.displaySavedBucket();
       setTimeout(() => {  
-        this.bucketSaved.emit(bucketId); 
+        this.bucketSaved.emit(); 
         this.spinner.hide();
       },
       1000);
