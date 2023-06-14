@@ -140,7 +140,8 @@ export class ImageGalleryComponent implements OnInit {
         this.items = this.allImages.slice(0, 12);
       } else {
         this.items = this.allImages.slice(this.tabsCounter*12, (this.tabsCounter + 1)*12);
-      }  
+      }
+      this.tabsCounter = 0;  
       this.needRefresh = true; 
     }
   }
