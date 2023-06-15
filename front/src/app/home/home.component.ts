@@ -190,6 +190,7 @@ export class HomeComponent implements AfterViewInit {
       this.imageEmbedding.setupImageEmbedding(res.images);
       this.textEmbedding.setupTextEmbedding(res.texts);
       this.imageGallery.updateImageGallery(res.images);
+      this.imageGallery.tabsCounter = 0;
       this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
       this.wordCloud.updateWordCloud(res.texts);
       this.spinner.hide();
@@ -218,6 +219,7 @@ export class HomeComponent implements AfterViewInit {
         this.imageEmbedding.setupImageEmbedding(res.images);
         this.textEmbedding.setupTextEmbedding(res.texts);
         this.imageGallery.updateImageGallery(res.images);
+      this.imageGallery.tabsCounter = 0;
         this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
         this.wordCloud.updateWordCloud(res.texts);
       } else {
@@ -257,6 +259,7 @@ export class HomeComponent implements AfterViewInit {
     this.imageEmbedding.setupImageEmbedding(res.images);
     this.textEmbedding.setupTextEmbedding(res.texts);
     this.imageGallery.updateImageGallery(res.images);
+      this.imageGallery.tabsCounter = 0;
     this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
     this.wordCloud.updateWordCloud(res.texts);
     this.spinner.hide();

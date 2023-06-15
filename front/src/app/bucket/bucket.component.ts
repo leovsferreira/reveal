@@ -53,17 +53,20 @@ export class BucketComponent implements OnInit {
   }
 
   destroyBucket(bucketId: number) {
-    this.spinner.show();
-    const query = this.bucketService.destroyUserBucket(bucketId);
-    query.then((data:any) => {
-      this.userBuckets = data;
-      this.destroySavedBucket(bucketId);
-      this.closeInUseBuckets(bucketId);
-      setTimeout(() => {  
-        this.spinner.hide();
-      },
-      1000);
-    });
+    let bool = confirm("Deseja excluir este bucket?");
+    if(bool) {
+      this.spinner.show();
+      const query = this.bucketService.destroyUserBucket(bucketId);
+      query.then((data:any) => {
+        this.userBuckets = data;
+        this.destroySavedBucket(bucketId);
+        this.closeInUseBuckets(bucketId);
+        setTimeout(() => {  
+          this.spinner.hide();
+        },
+        1000);
+      });
+    }
   }
 
   closeBucket(bucketId: number) {

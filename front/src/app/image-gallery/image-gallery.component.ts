@@ -22,7 +22,7 @@ export class ImageGalleryComponent implements OnInit {
   public selectedIndices: number[] = [];
   public selectedImagePaths: string[] = [];
   private allImages: any[] = [];
-  private tabsCounter: number = 0;
+  public tabsCounter: number = 0;
   public settings = {
     counter: false,
     plugins: [lgZoom, lgThumbnail],
@@ -142,7 +142,6 @@ export class ImageGalleryComponent implements OnInit {
       } else {
         this.items = this.allImages.slice(this.tabsCounter*12, (this.tabsCounter + 1)*12);
       }  
-      this.tabsCounter = 0;
       this.needRefresh = true; 
     }
   }
