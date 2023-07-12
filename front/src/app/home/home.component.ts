@@ -13,7 +13,7 @@ import { ModelGalleryComponent } from 'src/app/model-gallery/model-gallery.compo
 import { ApiService } from 'src/app/shared/api.service';
 import { AuthService } from '../shared/services/auth.service';
 import { GlobalService } from 'src/app/shared/global.service';
-import { Query, StateQuery } from '../shared/api.models';
+import { Query, StateQuery, InfoQuery } from '../shared/api.models';
 import { UntypedFormGroup, UntypedFormControl, Validators} from '@angular/forms';
 import { ContextMenu, MenuItemModel, ContextMenuModel, MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { enableRipple } from '@syncfusion/ej2-base';
@@ -31,6 +31,7 @@ export class HomeComponent implements AfterViewInit {
   public Query: Query = new Query();
   public EmbeddingQuery: Query = new Query();
   public StateQuery: StateQuery = new StateQuery();
+  public InfoQuery: InfoQuery = new InfoQuery();
 
   public images: string[] = [];
   public texts: string[] = [];
@@ -599,5 +600,11 @@ export class HomeComponent implements AfterViewInit {
       }
     }
     this.bucket.bucketToDrop = -1; 
+  }
+
+  async infoQuery (event: string) {
+    this.InfoQuery['string'] = event;
+    const res = await this.api.getInfo(this.InfoQuery);
+    this.imageGallery.info = res;
   }
 }

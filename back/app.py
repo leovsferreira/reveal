@@ -105,6 +105,8 @@ def search():
     unique_texts = unique_texts.sort_values(by=['sim'], ascending=False)
 
     # building images and word data
+    images = images[images.image_paths != '62955.jpg']
+    images = images[images.image_paths != '27415.jpg']
     image_index = images.index.tolist()
     images = images.to_numpy()
     image_coords = images[:, [2,3]].tolist()
@@ -162,6 +164,8 @@ def get_state():
     images = images.iloc[image_ids, :]
     texts = texts.iloc[text_ids, :]
     # building images and word data
+    images = images[images.image_paths != '62955.jpg']
+    images = images[images.image_paths != '27415.jpg']
     image_index = images.index.tolist()
     images = images.to_numpy()
     image_coords = images[:, [2,3]].tolist()
@@ -234,6 +238,15 @@ def build_new_set():
     image_data = {"similarities": im_sim, "labels":image_ids}
     word_data = {"similarities": wo_sim,"labels": text_ids}
     return jsonify({'texts': word_data, 'images':image_data})
+
+@app.route('/api/info', methods=['POST'])
+def get_info():
+    parameters = request.get_json()
+    # reading datasets
+    image_path = parameters['string']
+    df = pd.read_csv("news_final_texts.csv")
+    text =  df.loc[df['image_paths'] == image_path, 'text'].item()
+    return jsonify(text)
 
 if __name__ == '__main__':
     # run web server

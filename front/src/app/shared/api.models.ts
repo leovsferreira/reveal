@@ -49,3 +49,10 @@ export class BuildSetQuery {
     }
 }
 
+export class InfoQuery {
+    string: string;
+
+    constructor() {
+        this.string = "";   
+    }
+}
