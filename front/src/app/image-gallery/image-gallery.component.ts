@@ -1,7 +1,8 @@
-import { Component, OnInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, Output, EventEmitter, TemplateRef } from '@angular/core';
 import { LightGallery } from 'lightgallery/lightgallery';
 import lgZoom from 'lightgallery/plugins/zoom';
 import lgThumbnail from 'lightgallery/plugins/thumbnail';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-image-gallery',
@@ -12,10 +13,12 @@ import lgThumbnail from 'lightgallery/plugins/thumbnail';
 export class ImageGalleryComponent implements OnInit {
   
   @ViewChild("imageGallery", { static: true }) private imageGalleryDiv!: ElementRef;
-  
+  @ViewChild('infoTemplate', { static: true }) private infoTemplate!:TemplateRef<any>;
+
   @Output() toggleImage = new EventEmitter<any>();
   @Output() gallerySearchSelected = new EventEmitter<any>();
   @Output() dropImage = new EventEmitter<any>();
+  @Output() getInfo = new EventEmitter<any>();
 
   private lightGallery!: LightGallery;
   private needRefresh = false;
@@ -31,12 +34,21 @@ export class ImageGalleryComponent implements OnInit {
   };
   public items:any = [];
   public draggedImageUrl: any;
-  constructor() { }
+  public modalRef: BsModalRef = new BsModalRef;
+  public template: any;
+  public info: string = "";
+  constructor(private modalService: BsModalService) { }
 
+
+
+  ngOnInit(): void { }
   
-  ngOnInit(): void {
-
-  }  
+  ngAfterViewInit() {
+    this.template = this.infoTemplate;
+    document.getElementById("lg-info-1")!.addEventListener("click", () => {
+      this.openModal(this.template);
+    });
+  }
 
   ngAfterViewChecked(): void {
     if (this.needRefresh) {
@@ -46,7 +58,6 @@ export class ImageGalleryComponent implements OnInit {
       for(let i = 0; i < images.length; i++) { 
         images[i].addEventListener('dragend', (event:any) => {
           this.draggedImageUrl = event.target.src.replace('http://localhost:4200','.')
-          console.log(this.draggedImageUrl)
           this.dropImage.emit(this.draggedImageUrl);
         });
       }
@@ -55,7 +66,8 @@ export class ImageGalleryComponent implements OnInit {
 
   onInit = (detail:any): void => {
     this.lightGallery = detail.instance;
-    const lg = document.getElementById('gallery')!;
+    const customButtom = '<button type="button" aria-label="Info" id="lg-info-1" class="lg-icon"><i class="fa-solid fa-question fa-xs"></i></button>';
+    detail.instance.outer.find('.lg-toolbar').append(customButtom);
   };
 
   updateImageGallery(data: any) {
@@ -196,4 +208,14 @@ export class ImageGalleryComponent implements OnInit {
   clear() {
     this.items = [];
   }
+
+  openModal(template: TemplateRef<any>) {
+    this.modalRef = this.modalService.show(template);
+  }
+
+  onAfterSlide = (detail: any): void => {
+    const image = document.getElementsByClassName("lg-thumb-item active")[0].children[0] as HTMLImageElement;
+    const string = image.src.replace("https://storage.googleapis.com/pm2023/art/thumbnails/","")
+    this.getInfo.emit(string);
+  };
 }

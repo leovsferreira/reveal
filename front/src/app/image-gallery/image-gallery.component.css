@@ -42,3 +42,7 @@
     transform: translateY(2px);
     filter: saturate(150%);
 }
+
+::ng-deep .modal {
+    z-index: 99999;
+}

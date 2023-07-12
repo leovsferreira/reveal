@@ -3,7 +3,7 @@
 </button> 
     
 <div id="gallery" oncontextmenu="return false">
-  <lightgallery id="lightgallery" [settings]="settings" [onInit]="onInit">
+  <lightgallery id="lightgallery" [settings]="settings" [onInit]="onInit" [onAfterSlide]="onAfterSlide">
     <a *ngFor="let item of items" class='grid-item' [attr.href]="item.src"
     [style.width.px]="item.width"
     [style.height.px]="item.height" 
@@ -24,3 +24,14 @@
   <i [style.color]="this.hasNext() ? 'rgb(0, 175, 193)' : 'rgb(149, 165, 166)'"  class="fa-solid fa-arrow-right-long"></i>
 </button> 
 
+<ng-template #infoTemplate>
+  <div class="modal-header">
+    <h1 class="modal-title pull-left" style="color: #808080">Art info</h1>
+    <button type="button"  class="btn btn-custom" style="background-color:rgb(238, 238, 238) !important;" aria-label="Close" (click)="modalRef.hide()">
+        <i style="color: rgb(0, 175, 193);" class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+  <div class="modal-body">
+    {{info}}
+  </div>
+</ng-template>

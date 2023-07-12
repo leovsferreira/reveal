@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Query, StateQuery, BuildSetQuery } from "./api.models";
+import { Query, StateQuery, BuildSetQuery, InfoQuery } from "./api.models";
 
 
 @Injectable()
@@ -8,6 +8,7 @@ export class ApiService {
     xhttp_url_search: string = 'http://localhost:8001/api/search';
     xhttp_url_state: string = 'http://localhost:8001/api/state';
     xhttp_url_build_set: string = 'http://localhost:8001/api/build_set';
+    xhttp_url_info: string = 'http://localhost:8001/api/info';
 
     constructor() { }
 
@@ -77,5 +78,23 @@ export class ApiService {
         });
         
         return await response.json();        
+    }
+
+    async getInfo(infoQuery: InfoQuery): Promise<any> {
+        let query = new InfoQuery();
+        query['string'] = infoQuery['string'];
+        // post header
+        const headers = {
+            'Content-Type': 'application/json',
+            'dataType': 'json'
+        };
+        // Return a new promise.
+        const response = await fetch(this.xhttp_url_info, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(query),
+        });
+
+        return await response.json();
     }
 }

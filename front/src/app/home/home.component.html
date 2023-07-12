@@ -121,7 +121,8 @@
                 [style.display]="this.wichModeSelected == 'gallery' ? 'block' : 'none'"
                 (toggleImage) = "this.toggleEmbeddingImageFromGallery($event)"
                 (gallerySearchSelected)="this.searchSelected($event)"
-                (dropImage) = "this.addImageToBucket($event)">
+                (dropImage) = "this.addImageToBucket($event)"
+                (getInfo) = "this.infoQuery($event)">
                 </app-image-gallery>
                 <app-word-cloud [style.visibility]="this.wichModeSelected == 'cloud' ? '' : 'hidden'"
                 (toggleText) = "this.toggleEmbeddingTextFromCloud($event)">

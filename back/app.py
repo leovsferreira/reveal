@@ -235,6 +235,14 @@ def build_new_set():
     word_data = {"similarities": wo_sim,"labels": text_ids}
     return jsonify({'texts': word_data, 'images':image_data})
 
+@app.route('/api/info', methods=['POST'])
+def get_info():
+    parameters = request.get_json()
+    # reading datasets
+    image_path = parameters['string']
+    df = pd.read_csv("art_final_texts.csv")
+    text =  df.loc[df['image_paths'] == image_path, 'text'].item()
+    return jsonify(text)
 if __name__ == '__main__':
     # run web server
     app.run(host=HOST,
