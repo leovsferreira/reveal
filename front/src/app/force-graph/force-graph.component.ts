@@ -53,6 +53,7 @@ export class ForceGraphComponent implements OnInit {
     .nodeRelSize(5)
     .linkDirectionalArrowLength(link => this.highlightLinks.has(link) ? 8 : 3)
     .linkDirectionalArrowColor(link => this.highlightLinks.has(link) ? "#FF0080" : "rgba(0,0,0,0.28)")
+    .cooldownTicks(0)
     .onNodeClick((node, event) => {
       if (event.ctrlKey || event.shiftKey || event.altKey) { 
         // multi seleção
