@@ -34,8 +34,8 @@ export class WordCloudComponent implements OnInit {
     this.selectedIndices = [];
     const words: any = [];
     const topTwenty: any = [];
-    if(data.numberOfTexts >= 20) {
-      for(let i = 0; i < 20; i++) {
+    if(data.numberOfTexts >= 40) {
+      for(let i = 0; i < 40; i++) {
         topTwenty.push(data.similarities[i])
       }
     } else {
