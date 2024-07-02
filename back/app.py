@@ -24,8 +24,8 @@ def search():
     # get parameters from request
     parameters = request.get_json()
     # reading datasets
-    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
-    unique_texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0")
+    unique_texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0")
     # load image embedding
     image_embedding = torch.load('multi_clip_image_tensors.pt', map_location=torch.device('cpu'))
     # load word embedding
@@ -106,14 +106,14 @@ def search():
     # building images and word data
     image_index = images.index.tolist()
     images = images.to_numpy()
-    image_coords = images[:, [1,2]].tolist()
-    image_path = images[:, [0]].tolist()
+    image_coords = images[:, [2,3]].tolist()
+    image_path = images[:, [1]].tolist()
     images_sim = list(chain.from_iterable(images[:, [4]].tolist()))
     text_ids = []
 
     for i in range(len(images)):
         try:
-            text_string_list = images[i][3].split(',')
+            text_string_list = images[i][0].split(',')
         except:
             text_string_list = [-1]
         text_int_list = [int(x) for x in text_string_list]
@@ -124,14 +124,14 @@ def search():
     word_index = unique_texts.index.tolist()
     unique_texts = unique_texts.to_numpy()
 
-    word_coords = unique_texts[:, [1,2]].tolist()
+    word_coords = unique_texts[:, [2,3]].tolist()
     word_labels = unique_texts[:, [0]].tolist()
     words_sim = list(chain.from_iterable(unique_texts[:, [4]].tolist()))
     image_ids = []
 
     for i in range(len(unique_texts)):
         try:
-            image_string_list = unique_texts[i][3].split(',')
+            image_string_list = unique_texts[i][1].split(',')
         except:
             image_string_list = [-1]
         image_int_list = [int(x) for x in image_string_list]
@@ -145,8 +145,8 @@ def search():
 def get_state():
     parameters = request.get_json()
     # reading datasets
-    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
-    texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0")
+    texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0")
     image_ids = parameters['imagesIds']
     text_ids = parameters['textsIds']
     if len(np.shape(parameters["imagesSimilarities"])) > 1:
@@ -163,14 +163,14 @@ def get_state():
     # building images and word data
     image_index = images.index.tolist()
     images = images.to_numpy()
-    image_coords = images[:, [1,2]].tolist()
-    image_path = images[:, [0]].tolist()
+    image_coords = images[:, [2,3]].tolist()
+    image_path = images[:, [1]].tolist()
     text_ids = []
 
     for i in range(len(images)):
         try:
             print(images[i])
-            text_string_list = images[i][3].split(',')
+            text_string_list = images[i][0].split(',')
         except:
             text_string_list = ["-1"]
         text_int_list = [int(x) for x in text_string_list]
@@ -180,13 +180,13 @@ def get_state():
     
     word_index = texts.index.tolist()
     unique_texts = texts.to_numpy()
-    word_coords = unique_texts[:, [1,2]].tolist()
+    word_coords = unique_texts[:, [2,3]].tolist()
     word_labels = unique_texts[:, [0]].tolist()
     image_ids = []
 
     for i in range(len(unique_texts)):
         try:
-            image_string_list = unique_texts[i][3].split(',')
+            image_string_list = unique_texts[i][1].split(',')
         except:
             image_string_list = ["-1"]
         image_int_list = [int(x) for x in image_string_list]
