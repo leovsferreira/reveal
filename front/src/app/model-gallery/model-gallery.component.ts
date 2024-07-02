@@ -37,7 +37,7 @@ export class ModelGalleryComponent implements OnInit {
 
   openModal(imagesList: any) {
     for(let i = 0; i < imagesList.length; i++) {
-      this.items.push({src: `${imagesList[i].replace("thumbnails","paintings")}`,
+      this.items.push({src: `${imagesList[i].replace("thumbnails_USA","images_USA")}`,
                        thumb: `${imagesList[i]}`, 
                        index: i,                       
                        width: 120, 
