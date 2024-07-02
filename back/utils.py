@@ -151,7 +151,7 @@ def build_text_tokenizer():
     return tokenizer
 
 def get_torch_device():
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return "cpu"
 """
 def choose_query_based_on_origin(parameters, query_type, images):
     if 'query' in parameters:
