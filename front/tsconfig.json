@@ -19,7 +19,6 @@
     "target": "es2020",
     "module": "es2020",
     "typeRoots": ["../node_modules/@types"],
-    "types": ["webgl2", "offscreencanvas"],
     "lib": [
       "es2020",
       "dom"

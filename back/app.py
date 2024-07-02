@@ -24,12 +24,12 @@ def search():
     # get parameters from request
     parameters = request.get_json()
     # reading datasets
-    images = pd.read_csv('arts_multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
-    unique_texts = pd.read_csv('arts_multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
+    unique_texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
     # load image embedding
-    image_embedding = torch.load('arts_multi_clip_image_tensors.pt', map_location=torch.device('cpu'))
+    image_embedding = torch.load('multi_clip_image_tensors.pt', map_location=torch.device('cpu'))
     # load word embedding
-    word_embedding = torch.load('arts_multi_clip_word_tensors.pt', map_location=torch.device('cpu'))
+    word_embedding = torch.load('multi_clip_word_tensors.pt', map_location=torch.device('cpu'))
 
     query_type = parameters['queryType']
     similarity_value = parameters['similarityValue'] / 100
@@ -145,8 +145,8 @@ def search():
 def get_state():
     parameters = request.get_json()
     # reading datasets
-    images = pd.read_csv('arts_multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
-    texts = pd.read_csv('arts_multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
+    texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
     image_ids = parameters['imagesIds']
     text_ids = parameters['textsIds']
     if len(np.shape(parameters["imagesSimilarities"])) > 1:
@@ -240,7 +240,7 @@ def get_info():
     parameters = request.get_json()
     # reading datasets
     image_path = parameters['string']
-    df = pd.read_csv("art_final_texts.csv")
+    df = pd.read_csv("usa_final_texts.csv")
     text =  df.loc[df['image_paths'] == image_path, 'text'].item()
     return jsonify(text)
 if __name__ == '__main__':
