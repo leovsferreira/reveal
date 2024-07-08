@@ -49,11 +49,11 @@ export class ForceGraphComponent implements OnInit {
     this.forceGraph = ForceGraph()(this.forceGraphDiv.nativeElement).graphData(this.forceGraphData)
     .autoPauseRedraw(false)
     .dagMode('lr')
-    .dagLevelDistance(50)
+    .dagLevelDistance(80)
+    .d3Force('collide', d3.forceCollide(50))
     .nodeRelSize(5)
     .linkDirectionalArrowLength(link => this.highlightLinks.has(link) ? 8 : 3)
     .linkDirectionalArrowColor(link => this.highlightLinks.has(link) ? "#FF0080" : "rgba(0,0,0,0.28)")
-    .cooldownTicks(0)
     .onNodeClick((node, event) => {
       if (event.ctrlKey || event.shiftKey || event.altKey) { 
         // multi seleção
@@ -125,7 +125,6 @@ export class ForceGraphComponent implements OnInit {
     .nodeCanvasObject((node: any, ctx: any) => this.setNodeShape(node, this.setNodeColor(node), ctx, this.parentNode))
     .nodePointerAreaPaint(this.setNodeShape)
     .onNodeHover(node =>  { this.hoverNode = node || null })
-    .d3Force("r", d3.forceRadial(5))
     .nodeLabel((node:any)  =>  this.buildTooltip(node, node.queryType));
 
     this.setSize();

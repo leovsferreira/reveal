@@ -83,63 +83,60 @@
     </div>
 
     <div class="visualizations">
-        <div class="embeddings">
-            <div class="embedding" id="image-embedding-div">
-                <app-image-embedding
-                (imageLinkSelected) = "this.linkImagesAndTexts($event)"
-                (clearEmbeddingsSelection) = "this.onSelectionsClear()"
-                (highlightImageGallery) = "this.highlightImageGallery($event)"
-                ></app-image-embedding>
-            </div>
-            <div class="legend">
-                <div class="d3-color-legend">
-                    <app-color-legend></app-color-legend>
-                </div>
-            </div>
-            <div class="embedding" id="text-embedding-div">
-                <app-text-embedding
-                (textLinkSelected) = "this.linkImagesAndTexts($event)"
-                (clearEmbeddingsSelection) = "this.onSelectionsClear()"
-                (highlightWordCloud) = "this.highlightWordCloud($event)"
-                ></app-text-embedding>
+        <div class="embedding" id="image-embedding-div">
+            <app-image-embedding
+            (imageLinkSelected) = "this.linkImagesAndTexts($event)"
+            (clearEmbeddingsSelection) = "this.onSelectionsClear()"
+            (highlightImageGallery) = "this.highlightImageGallery($event)"
+            ></app-image-embedding>
+        </div>
+        <div class="legend">
+            <div class="d3-color-legend">
+                <app-color-legend></app-color-legend>
             </div>
         </div>
-        <div class="infos">
-            <div class="mode-control">
-                <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'gallery' ? '#eee' : '#fff' " type="button" (click)="this.setMode('gallery')">
-                    <span class="fa-solid fa-image"
-                    [style.color]="this.wichModeSelected == 'gallery' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
-                </button>
-                <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'cloud' ? '#eee' : '#fff' " type="button" (click)="this.setMode('cloud')">
-                    <span class="fa-solid fa-cloud"
-                    [style.color]="this.wichModeSelected == 'cloud' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
-                </button>
-            </div>
-            <div class="gallery" id="gallery-div">
-                <app-image-gallery 
-                [style.visibility]="this.wichModeSelected == 'gallery' ? '' : 'hidden'"
-                [style.display]="this.wichModeSelected == 'gallery' ? 'block' : 'none'"
-                (toggleImage) = "this.toggleEmbeddingImageFromGallery($event)"
-                (gallerySearchSelected)="this.searchSelected($event)"
-                (dropImage) = "this.addImageToBucket($event)"
-                (getInfo) = "this.infoQuery($event)">
-                </app-image-gallery>
-                <app-word-cloud [style.visibility]="this.wichModeSelected == 'cloud' ? '' : 'hidden'"
-                (toggleText) = "this.toggleEmbeddingTextFromCloud($event)">
-                </app-word-cloud>
-            </div>
-            <div class="force-graph" id="force-graph-div" style="z-index: 99;">
-                <app-force-graph
-                (embeddingState) = "this.embeddingsToState($event)"
-                (resetAll) = "this.resetAll('reset')"
-                ></app-force-graph>
-            </div>
+        <div class="embedding" id="text-embedding-div">
+            <app-text-embedding
+            (textLinkSelected) = "this.linkImagesAndTexts($event)"
+            (clearEmbeddingsSelection) = "this.onSelectionsClear()"
+            (highlightWordCloud) = "this.highlightWordCloud($event)"
+            ></app-text-embedding>
         </div>
+        <div class="mode-control" style="left: 68%;">
+            <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'gallery' ? '#eee' : '#fff' " type="button" (click)="this.setMode('gallery')">
+                <span class="fa-solid fa-image"
+                [style.color]="this.wichModeSelected == 'gallery' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+            </button>
+            <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'cloud' ? '#eee' : '#fff' " type="button" (click)="this.setMode('cloud')">
+                <span class="fa-solid fa-cloud"
+                [style.color]="this.wichModeSelected == 'cloud' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+            </button>
+        </div>
+        <div class="gallery" id="gallery-div">
+            <app-image-gallery 
+            [style.visibility]="this.wichModeSelected == 'gallery' ? '' : 'hidden'"
+            [style.display]="this.wichModeSelected == 'gallery' ? 'block' : 'none'"
+            (toggleImage) = "this.toggleEmbeddingImageFromGallery($event)"
+            (gallerySearchSelected)="this.searchSelected($event)"
+            (dropImage) = "this.addImageToBucket($event)"
+            (getInfo) = "this.infoQuery($event)">
+            </app-image-gallery>
+            <app-word-cloud [style.visibility]="this.wichModeSelected == 'cloud' ? '' : 'hidden'"
+            (toggleText) = "this.toggleEmbeddingTextFromCloud($event)">
+            </app-word-cloud>
+        </div>
+
         <ul id="contextmenu-text-embedding"></ul>
         <ul id="contextmenu-image-embedding"></ul>
-        <ul id="contextmenu-force-graph"></ul>
         <ul id="contextmenu-galleries"></ul>
     </div>
+    <div class="force-graph" id="force-graph-div" style="z-index: 99;">
+        <app-force-graph
+        (embeddingState) = "this.embeddingsToState($event)"
+        (resetAll) = "this.resetAll('reset')"
+        ></app-force-graph>
+    </div>
+    <ul id="contextmenu-force-graph"></ul>
     <div class="add-bucket">
         <button type="button" style="background-color:rgb(238, 238, 238) !important;" class="btn btn-custom" (click)="openModal(templateBucket)">
             <i style="color: rgb(0, 175, 193);" class="fa-solid fa-plus"></i>

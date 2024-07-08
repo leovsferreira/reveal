@@ -8,6 +8,7 @@
 #gallery {
     width: 360px; /* Can be in percentage also. */
     margin: 0 auto;
+    margin-top: 10%;
 }
 
 .btn:focus {
