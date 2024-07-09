@@ -48,12 +48,14 @@ export class ForceGraphComponent implements OnInit {
 
     this.forceGraph = ForceGraph()(this.forceGraphDiv.nativeElement).graphData(this.forceGraphData)
     .autoPauseRedraw(false)
-    .dagMode('lr')
+    .dagMode('lr') // Left-to-right DAG layout
     .dagLevelDistance(80)
-    .d3Force('collide', d3.forceCollide(50))
+    .d3Force('collide', d3.forceCollide(50)) // Add collision force to avoid nodes being too close
     .nodeRelSize(5)
-    .linkDirectionalArrowLength(link => this.highlightLinks.has(link) ? 8 : 3)
-    .linkDirectionalArrowColor(link => this.highlightLinks.has(link) ? "#FF0080" : "rgba(0,0,0,0.28)")
+    .linkDirectionalArrowLength(4)
+    .linkDirectionalArrowColor("#FF0080")
+    .warmupTicks(300) 
+    .cooldownTicks(0)
     .onNodeClick((node, event) => {
       if (event.ctrlKey || event.shiftKey || event.altKey) { 
         // multi seleção
@@ -71,61 +73,22 @@ export class ForceGraphComponent implements OnInit {
       } else {
         this.parentNode.clear();
         this.parentNode.add(node);
-        //this.highlightLinks.clear();
+        
         this.currentMainNode = node;
 
         this.embeddingState.emit([this.currentMainNode.imagesIds,
                                   this.currentMainNode.imagesSimilarities, 
                                   this.currentMainNode.textsIds, 
                                   this.currentMainNode.textsSimilarities]);
-        //muda o currentMainNode
-        /**
-               if(node.id == 0) {
-          this.sourceNodeId = 0;
-          this.currentMainNode = node;
-          this.embeddingState.emit(this.currentMainNode.imagesIds);
-        } else {
-          for(let i = 0; i < this.forceGraphData.links.length; i++) {
-            this.highlightLinks.add(this.forceGraphData.links[i]);
-            if(this.forceGraphData.links[i].target.id == node.id) {
-              this.highlightLinks.add(this.forceGraphData.links[i]);
-              this.sourceNodeId = node.id
-              this.currentMainNode = node;
-              this.embeddingState.emit(this.currentMainNode.imagesIds);
-              break;
-            };
-          }
-        */
       }
     })
-    /**
-    .onNodeDrag(dragNode => {
-      this.dragSourceNode = dragNode;
-      this.selectedNodes.clear();
-    })
-    .onNodeDragEnd(() => {
-      for (let node of this.forceGraphData.nodes) {
-        if (this.dragSourceNode === node) {
-          continue;
-        }
-        // close enough: snap onto node as target for suggested link
-        if (this.distance(this.dragSourceNode, node) < this.snapInDistance) {
-          this.draggedNodes.add(this.dragSourceNode);
-          this.draggedNodes.add(node);
-          this.buildNewNode('union', this.draggedNodes);
-        }
-      }
-      this.dragSourceNode = null;
-      this.draggedNodes.clear();
-      console.log(this.draggedNodes);
-    })
-     */
 
     .nodeColor((node: any) => this.setNodeColor(node))
     .nodeCanvasObject((node: any, ctx: any) => this.setNodeShape(node, this.setNodeColor(node), ctx, this.parentNode))
     .nodePointerAreaPaint(this.setNodeShape)
     .onNodeHover(node =>  { this.hoverNode = node || null })
-    .nodeLabel((node:any)  =>  this.buildTooltip(node, node.queryType));
+    .nodeLabel((node:any)  =>  this.buildTooltip(node, node.queryType))
+    .enableNodeDrag(false);
 
     this.setSize();
 
@@ -146,7 +109,6 @@ export class ForceGraphComponent implements OnInit {
     const textsIds = schema.textsIds;
     const textsSimilarities = schema.textsSimilarities;
     this.forceGraphData.nodes.push({id: nodeId,
-                                    fy: 0,
                                     textsQuery: textsQuery,
                                     imagesQuery: imagesQuery,
                                     queryType: queryType,
@@ -166,14 +128,7 @@ export class ForceGraphComponent implements OnInit {
     }
     this.parentNode.clear();
     this.parentNode.add(this.forceGraphData.nodes[this.forceGraphData.nodes.length - 1]);
-    /**
-      if(nodeId != 0) {
-      this.forceGraphData.links.push({source: this.sourceNodeId, target: this.targetNodeId});
-      this.highlightLinks.add(this.forceGraphData.links[this.forceGraphData.links.length - 1]);
-      this.sourceNodeId = this.targetNodeId;
-      this.targetNodeId++;
-    }
-     */
+
     this.forceGraph.graphData(this.forceGraphData);
     this.nodeId  +=  1;
   }
@@ -225,10 +180,6 @@ export class ForceGraphComponent implements OnInit {
       //seta parent node para o último criado antes de deeletar
       this.parentNode.clear();
 
-      /**
-       * TODO:
-       * RESETAR TODAS AS VIEW SE TODOS OS NÓS FOREM DELETADOS
-       */
       if(this.forceGraphData.nodes.length > 0) {
         const node = this.forceGraphData.nodes[this.forceGraphData.nodes.length - 1]
         this.parentNode.add(node);
@@ -341,7 +292,6 @@ export class ForceGraphComponent implements OnInit {
                               textsSimilarities]);
     //adiciona nó ao dado
     this.forceGraphData.nodes.push({id: nodeId,
-                                    fy: 0, 
                                     textsQuery: textsQuery, 
                                     imagesQuery: imagesQuery, 
                                     queryType: queryType, 
@@ -437,6 +387,34 @@ export class ForceGraphComponent implements OnInit {
     const iteractionType = node.iteractionType;
     [
       () => { 
+              //squares with node sequence
+              const width = 8;
+              const height = 8;
+              const radius = 2; // Radius for rounded corners
+              
+              const x = node.x - width / 2;
+              const y = node.y - height / 2;
+              
+              ctx.fillStyle = "#af7aa1";
+              ctx.beginPath();
+              ctx.moveTo(x + radius + 2, y + 2);
+              ctx.lineTo(x + width - radius + 2, y + 2);
+              ctx.arcTo(x + width + 2, y + 2, x + width + 2, y + radius + 2, radius);
+              ctx.lineTo(x + width + 2, y + height - radius + 2);
+              ctx.arcTo(x + width + 2, y + height + 2, x + width - radius + 2, y + height + 2, radius);
+              ctx.lineTo(x + radius + 2, y + 2 + height);
+              ctx.arcTo(x + 2, y + 2 + height, x + 2, y + 2 + height - radius, radius);
+              ctx.lineTo(x + 2, y + 2 + radius);
+              ctx.arcTo(x + 2, y + 2, x + 2 + radius, y + 2, radius);
+              ctx.fill();
+              
+              ctx.fillStyle = 'white';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.font = '4px Roboto';
+              ctx.fillText(node.id + 1, x + 2 + width / 2, y + 2 + height / 2);
+              //
+
               if(isParent) {
                 ctx.fillStyle = "#edc949"
                 ctx.beginPath();
