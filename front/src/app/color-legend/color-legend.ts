@@ -68,7 +68,8 @@ export class ColorLegend {
             .attr("transform", "translate(" + 0 + " ," + (-12) + ")")
             .call(d3.axisRight(legendScale)
             .ticks(4)
-            .tickSize(12))
+            .tickSize(12)
+            .tickFormat((d:any) => (d * 100).toFixed(0)))
     
         this.svgCanvas.selectAll(".legend-scale line")
             .attr("stroke", "#fff");
