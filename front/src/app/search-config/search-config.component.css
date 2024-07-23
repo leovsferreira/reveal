@@ -4,3 +4,23 @@
     margin-left: 82px;
     top: 171px;
 }
+
+mat-slider {
+    width: 232px;
+}
+
+::ng-deep .mat-slider-track-fill {
+    background-color: rgb(0, 175, 193) !important;
+}
+
+::ng-deep .mat-slider-thumb {
+    background-color: rgb(0, 175, 193) !important;
+}
+
+::ng-deep .mat-slider-tick-active {
+    background-color: rgb(0, 175, 193) !important;
+}
+
+::ng-deep .mat-slider-thumb-label {
+    background-color: rgb(0, 175, 193) !important;
+}

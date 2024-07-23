@@ -21,9 +21,8 @@ export class SearchConfigComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  updateTextInput(value: string) {
-    this.textInput = value;
-    this.similarityChanged.emit(parseInt(value));
+  updateTextInput(value: number) {
+    this.similarityChanged.emit(value);
   }
 
   onDragBoxToggle() {
@@ -49,5 +48,9 @@ export class SearchConfigComponent implements OnInit {
     else this.linkInputDisabled = true;
     
     this.clearEmbeddingsSelection.emit();
+  }
+
+  formatLabel(value: number) {
+    return value;
   }
 }

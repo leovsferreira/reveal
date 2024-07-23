@@ -7,6 +7,7 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LightgalleryModule } from 'lightgallery/angular';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSliderModule } from '@angular/material/slider';
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal'
 
 import { AppComponent } from './app.component';
@@ -66,6 +67,7 @@ import { ModelGalleryComponent } from './model-gallery/model-gallery.component';
     LightgalleryModule,
     NgxSpinnerModule,
     MatSidenavModule,
+    MatSliderModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,

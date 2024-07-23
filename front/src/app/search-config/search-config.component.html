@@ -1,6 +1,18 @@
-<label for="customRange1" class="form-label">Similarity {{this.textInput}}</label>
-<input #similarityConfig (mousedown)="this.onDragBoxToggle()" (mouseup)="this.onDragBoxToggle()" type="range" value="80" class="form-range" min="70" max="100" step="1" id="customRange1" (change)="updateTextInput(similarityConfig.value)">
-
+<p style="margin-bottom: 0px;">Cosine Similarity</p>
+<mat-slider class="custom-slider"
+  #similarityConfig
+  thumbLabel 
+  [displayWith]="formatLabel"
+  tickInterval="1"
+  (mousedown)="this.onDragBoxToggle()" 
+  (mouseup)="this.onDragBoxToggle()" 
+  id="customRange1"
+  min="70" 
+  max="100" 
+  step="1" 
+  value="80"
+  (change)="updateTextInput(similarityConfig.value)">
+</mat-slider>
 <br>
 
 <!--

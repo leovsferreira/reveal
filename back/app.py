@@ -77,7 +77,10 @@ def format_image_data(images, indices_im, images_sim, parameters):
     images = images.to_numpy()
     image_coords = images[:, [2, 3]].tolist()
     image_path = images[:, [0]].tolist()
-    text_ids = [list(map(int, img[1].split(','))) if img[1] else [-1] for img in images]
+    text_ids = [
+                list(map(int, img[1].split(','))) if isinstance(img[1], str) and img[1] else [-1]
+                for img in images
+            ]
 
     return {
         "similarities": images_sim,
