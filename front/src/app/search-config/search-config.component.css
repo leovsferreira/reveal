@@ -6,7 +6,8 @@
 }
 
 mat-slider {
-    width: 232px;
+    width: 100%;
+    padding: 0px;
 }
 
 ::ng-deep .mat-slider-track-fill {
@@ -23,4 +24,27 @@ mat-slider {
 
 ::ng-deep .mat-slider-thumb-label {
     background-color: rgb(0, 175, 193) !important;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+::ng-deep .mat-datepicker-toggle {
+  color: rgb(0, 175, 193) !important;
+}
+
+::ng-deep .mat-calendar-body-selected {
+    background-color: rgb(0, 175, 193, .5) !important;
+    color: #fff;
+}
+
+::ng-deep .mat-calendar-body-today {
+    background-color: rgb(0, 175, 193, .3) !important;
+}
+
+@media (hover: hover) {
+    ::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+        background-color: rgb(0, 175, 193, .2) !important;
+    }
 }

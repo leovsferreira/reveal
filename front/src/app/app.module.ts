@@ -8,6 +8,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LightgalleryModule } from 'lightgallery/angular';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal'
 
 import { AppComponent } from './app.component';
@@ -68,6 +72,10 @@ import { ModelGalleryComponent } from './model-gallery/model-gallery.component';
     NgxSpinnerModule,
     MatSidenavModule,
     MatSliderModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,

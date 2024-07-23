@@ -1,4 +1,4 @@
-<p style="margin-bottom: 0px;">Cosine Similarity</p>
+<p style="margin-bottom: 0px;">Cosine similarity</p>
 <mat-slider class="custom-slider"
   #similarityConfig
   thumbLabel 
@@ -15,6 +15,16 @@
 </mat-slider>
 <br>
 
+<p style="margin-bottom: 12px; margin-top: 20px;">Date filter</p>
+<mat-form-field appearance="fill">
+  <mat-label>Enter a date range</mat-label>
+  <mat-date-range-input [rangePicker]="picker">
+    <input matStartDate placeholder="Start date">
+    <input matEndDate placeholder="End date">
+  </mat-date-range-input>
+  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-date-range-picker #picker></mat-date-range-picker>
+</mat-form-field>
 <!--
 <div class="form-check">
   <input class="form-check-input" type="radio" name="flexRadioControl" id="flexRadioControl1" value="link" checked [disabled]="this.linkInputDisabled" (change)="onLinkChange($event)">
