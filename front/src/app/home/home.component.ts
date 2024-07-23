@@ -158,7 +158,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   async search() {
-
+    
     this.Query.textsQuery = this.texts;
     this.Query.imagesQuery = this.images;
     this.Query.similarityValue = this.similarityValue;
@@ -195,6 +195,7 @@ export class HomeComponent implements AfterViewInit {
       this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
       this.wordCloud.updateWordCloud(res.texts);
       this.spinner.hide();
+      console.log(res)
     } else {
       alert("Query empty")
     }

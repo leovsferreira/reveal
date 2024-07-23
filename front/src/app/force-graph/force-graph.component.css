@@ -10,6 +10,7 @@
     position: absolute;
     right: 0px;
 }
+
 .legend li { float: right; margin-right: 10px; }
 .legend span { border: 1px solid #ccc; float: right; width: 14px; height: 14px; margin: 5px; border-radius: 30px; }
 /* your colors */
