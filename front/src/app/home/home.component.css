@@ -139,8 +139,8 @@
     position: absolute;
     top: 16px;
     left: 22px;
-    width: 258px;
-    height: 212px !important;
+    width: 284px;
+    height: 252px !important;
     z-index: -10;
   }
   
@@ -149,6 +149,15 @@
     width: 100%;
     margin: auto;
   }
+
+  .help-icon {
+    color: rgba(149, 165, 166, 1);
+    cursor: pointer;
+    position: absolute;
+    left: calc(69% + 73px);
+    top: 41px;
+    z-index: 100;
+}
 
   .search-bar {
     position: relative;

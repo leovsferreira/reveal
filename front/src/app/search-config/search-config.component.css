@@ -48,3 +48,35 @@ mat-form-field {
         background-color: rgb(0, 175, 193, .2) !important;
     }
 }
+
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .input-label {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+  }
+  
+  .aligned-icon {
+    vertical-align: middle;
+    margin-left: 4px; /* Adjust as needed */
+  }
+  
+  .custom-slider {
+    flex: 1;
+    margin-right: 8px;
+  }
+  
+  mat-form-field {
+    flex: 1;
+    margin-right: 8px;
+  }
+
+  .custom-icon {
+    color: rgba(149, 165, 166, 1) !important;
+  }
+  

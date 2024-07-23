@@ -32,3 +32,12 @@
     border-color: rgba(218, 223, 225, 0.8) !important;
     z-index: 2;
 }
+
+.help-icon {
+    color: rgba(149, 165, 166, 1);
+    cursor: pointer;
+    position: absolute;
+    left: calc(1% + 86px);
+    top: 41px;
+    z-index: 100;
+}

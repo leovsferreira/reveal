@@ -13,6 +13,8 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal'
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AppComponent } from './app.component';
 import { ImageEmbeddingComponent } from './image-embedding/image-embedding.component';
@@ -76,6 +78,8 @@ import { ModelGalleryComponent } from './model-gallery/model-gallery.component';
     MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
+    MatIconModule,
+    MatTooltipModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,

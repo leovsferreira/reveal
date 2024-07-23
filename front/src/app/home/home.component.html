@@ -39,7 +39,8 @@
     
     <div class="search-bar">
         <div class="wrap">
-            <button class="log-out" style="width: 39px; margin-left: 12px;" (click)="drawer.toggle()">
+            <button class="log-out" style="width: 39px; margin-left: 12px;" (click)="drawer.toggle()"
+                matTooltip="Open the lateral menu to view and manage your saved buckets and saved interface states. Access your stored multimodal data and previous work sessions.">
                 <span class="fa-solid fa-bars"></span>
             </button>
             <button class="log-out" (click)="authService.SignOut()">
@@ -50,22 +51,27 @@
                     <input id="texts" class="searchTerm" type="text" placeholder="{{placeholder}}" formControlName="texts" (ngModelChange)="onTextChange($event)">
                 </div>
                 <input id="images" multiple="" (change)="onFileChange($event)" #fileUpload type="file" id="img" formControlName="images" name="img" accept="image/*" style="display: none;">
-                <button style="border-left: 2px solid rgba(149, 165, 166, 1) !important;" type="button" class="control" (click)="this.toggleConfigVisibility()">
+                <button style="border-left: 2px solid rgba(149, 165, 166, 1) !important;" type="button" class="control" (click)="this.toggleConfigVisibility()"
+                    matTooltip="Settings to customize your search criteria and preferences. Adjust the filters and parameters to refine your search results.">
                     <i class="fa-solid fa-gear"></i>
                 </button>
-                <button style="border-left: 2px solid rgba(149, 165, 166, 1) !important;" type="button" class="image-search" (click)="fileUpload.click()">
+                <button style="border-left: 2px solid rgba(149, 165, 166, 1) !important;" type="button" class="image-search" (click)="fileUpload.click()"
+                    matTooltip="Upload one or multiple images to use as query input. These images will be analyzed to generate relevant search results based on their content.">
                     <i class="far fa-image"></i>
                 </button>
-                <button class="search-button" type="submit">
+                <button class="search-button" type="submit"
+                    matTooltip="Generate a new search using the provided query input, which can include text, images, or a combination of texts and images. Separate different texts entries with a semicolon (e.g., chicago;wind city).">
                     <i class="fa fa-search"></i>
                 </button>
             </form>
 
-            <button class="log-out" style="width: 39px; right: 60px; bottom:18px" (click)="openModal(templateState)">
+            <button class="log-out" style="width: 39px; right: 60px; bottom:18px" (click)="openModal(templateState)"
+                matTooltip="Save the interface state, including all data records, search history, and current visualization states, for future reference or continued work.">
                 <i class="fas fa-floppy-disk fa-xl"></i>
             </button>
 
-            <button class="log-out" style="width: 39px; right: 12px; bottom:18px" (click)="this.resetAll('reset')">
+            <button class="log-out" style="width: 39px; right: 12px; bottom:18px" (click)="this.resetAll('reset')"
+                matTooltip="Clear the interface to reset all input fields and remove any current data or search results.">
                 <i class="fas fa-trash"></i>
             </button>
             <!--<img *ngFor='let url of images'  [src]="url" height="150" width="200px" style="margin: 3px;"> <br/>-->
@@ -103,15 +109,18 @@
             ></app-text-embedding>
         </div>
         <div class="mode-control" style="left: 68%;">
-            <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'gallery' ? '#eee' : '#fff' " type="button" (click)="this.setMode('gallery')">
+            <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'gallery' ? '#eee' : '#fff' " type="button" (click)="this.setMode('gallery')"
+                matTooltip="Image gallery displaying query results in descending order of similarity. Select images to save them along with their text descriptions in multimodal data buckets. Click on them to see the whole image and its text.">
                 <span class="fa-solid fa-image"
                 [style.color]="this.wichModeSelected == 'gallery' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
             </button>
-            <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'cloud' ? '#eee' : '#fff' " type="button" (click)="this.setMode('cloud')">
+            <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'cloud' ? '#eee' : '#fff' " type="button" (click)="this.setMode('cloud')"
+                matTooltip="Word cloud presenting the top 20 concepts based on their similarity to the content of the given query. Visualize key terms related to your search.">
                 <span class="fa-solid fa-cloud"
                 [style.color]="this.wichModeSelected == 'cloud' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
             </button>
         </div>
+        <mat-icon matTooltip="To display the image gallery and word cloud, click on the image icon for the gallery and the cloud icon for the word cloud." class="help-icon">help</mat-icon>
         <div class="gallery" id="gallery-div">
             <app-image-gallery 
             [style.visibility]="this.wichModeSelected == 'gallery' ? '' : 'hidden'"
@@ -138,7 +147,8 @@
     </div>
     <ul id="contextmenu-force-graph"></ul>
     <div class="add-bucket">
-        <button type="button" style="background-color:rgb(238, 238, 238) !important;" class="btn btn-custom" (click)="openModal(templateBucket)">
+        <button type="button" style="background-color:rgb(238, 238, 238) !important;" class="btn btn-custom" (click)="openModal(templateBucket)"
+            matTooltip="Create a new bucket to store multimodal data, including images and their corresponding text.">
             <i style="color: rgb(0, 175, 193);" class="fa-solid fa-plus"></i>
         </button>   
     </div>

@@ -1,30 +1,40 @@
-<p style="margin-bottom: 0px;">Cosine similarity</p>
-<mat-slider class="custom-slider"
-  #similarityConfig
-  thumbLabel 
-  [displayWith]="formatLabel"
-  tickInterval="1"
-  (mousedown)="this.onDragBoxToggle()" 
-  (mouseup)="this.onDragBoxToggle()" 
-  id="customRange1"
-  min="70" 
-  max="100" 
-  step="1" 
-  value="80"
-  (change)="updateTextInput(similarityConfig.value)">
-</mat-slider>
-<br>
+<div class="input-group">
+  <p class="input-label">
+    Cosine similarity
+    <mat-icon class="aligned-icon custom-icon" matTooltip="Adjust the cosine similarity threshold to filter results based on their similarity. Higher values mean only more similar items will be included.">help</mat-icon>
+  </p>
+  <mat-slider class="custom-slider"
+    #similarityConfig
+    thumbLabel 
+    [displayWith]="formatLabel"
+    tickInterval="1"
+    (mousedown)="this.onDragBoxToggle()" 
+    (mouseup)="this.onDragBoxToggle()" 
+    id="customRange1"
+    min="70" 
+    max="100" 
+    step="1" 
+    value="80"
+    (change)="updateTextInput(similarityConfig.value)">
+  </mat-slider>
+</div>
 
-<p style="margin-bottom: 12px; margin-top: 20px;">Date filter</p>
-<mat-form-field appearance="fill">
-  <mat-label>Enter a date range</mat-label>
-  <mat-date-range-input [rangePicker]="picker">
-    <input matStartDate placeholder="Start date">
-    <input matEndDate placeholder="End date">
-  </mat-date-range-input>
-  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-  <mat-date-range-picker #picker></mat-date-range-picker>
-</mat-form-field>
+<div class="input-group">
+  <p class="input-label" style="margin-top: 20px;">
+    Date filter
+    <mat-icon class="aligned-icon custom-icon" matTooltip="Specify the date range to filter results within the selected period. Only items within the chosen start and end dates will be shown.">help</mat-icon>
+  </p>
+  <mat-form-field appearance="fill">
+    <mat-label>Enter a date range</mat-label>
+    <mat-date-range-input [rangePicker]="picker">
+      <input matStartDate placeholder="Start date">
+      <input matEndDate placeholder="End date">
+    </mat-date-range-input>
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+  </mat-form-field>
+</div>
+
 <!--
 <div class="form-check">
   <input class="form-check-input" type="radio" name="flexRadioControl" id="flexRadioControl1" value="link" checked [disabled]="this.linkInputDisabled" (change)="onLinkChange($event)">
