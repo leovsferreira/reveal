@@ -61,7 +61,7 @@ export class TextEmbeddingComponent implements OnInit {
         },
         renderMode: ScatterGL.RenderMode.POINT,
         orbitControls: {
-          zoomSpeed: 1.125,
+          zoomSpeed: 3,
         },
       });
 

@@ -96,7 +96,7 @@ export class ImageEmbeddingComponent implements OnInit {
         renderMode: ScatterGL.RenderMode.POINT,
         showLabelsOnHover: false,
         orbitControls: {
-          zoomSpeed: 1.125,
+          zoomSpeed: 3,
         },
       });
 
