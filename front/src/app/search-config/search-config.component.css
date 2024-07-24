@@ -50,33 +50,32 @@ mat-form-field {
 }
 
 .input-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-  }
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
   
-  .input-label {
-    display: flex;
-    align-items: center;
-    margin-right: 8px;
-  }
+.input-label {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
   
-  .aligned-icon {
-    vertical-align: middle;
-    margin-left: 4px; /* Adjust as needed */
-  }
+.aligned-icon {
+  vertical-align: middle;
+  margin-left: 4px; /* Adjust as needed */
+}
   
-  .custom-slider {
+.custom-slider {
     flex: 1;
     margin-right: 8px;
-  }
+}
   
-  mat-form-field {
-    flex: 1;
-    margin-right: 8px;
-  }
+mat-form-field {
+  flex: 1;
+  margin-right: 8px;
+}
 
-  .custom-icon {
-    color: rgba(149, 165, 166, 1) !important;
-  }
-  
+.custom-icon {
+  color: rgba(149, 165, 166, 1) !important;
+}
