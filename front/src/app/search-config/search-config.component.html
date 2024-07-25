@@ -1,4 +1,12 @@
 <div class="input-group">
+  <mat-checkbox (change)="toggleCombinedDisplay($event)"></mat-checkbox>
+  <p class="input-label" style="margin-top: 15px; margin-left: 5px;">Joint embedding
+    <mat-icon class="aligned-icon custom-icon" matTooltip="Check this box to display the image and text embeddings as a single joint embedding. Uncheck to view them separately.">help</mat-icon>
+  </p>
+  
+</div>
+
+<div class="input-group">
   <p class="input-label">
     Cosine similarity
     <mat-icon class="aligned-icon custom-icon" matTooltip="Adjust the cosine similarity threshold to filter results based on their similarity. Higher values mean only more similar items will be included.">help</mat-icon>

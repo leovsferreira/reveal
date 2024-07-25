@@ -12,6 +12,7 @@ export class SearchConfigComponent implements OnInit {
   @Output() dragBoxToggled = new EventEmitter<number>();
   @Output() similarityChanged = new EventEmitter<number>();
   @Output() clearEmbeddingsSelection = new EventEmitter();
+  @Output() toggleCombinedEmbedding = new EventEmitter<boolean>();
 
   public textInput = '80';
   public searchSelectorDisabled: boolean = true;
@@ -48,6 +49,10 @@ export class SearchConfigComponent implements OnInit {
     else this.linkInputDisabled = true;
     
     this.clearEmbeddingsSelection.emit();
+  }
+
+  toggleCombinedDisplay(event: any) {
+    this.toggleCombinedEmbedding.emit(event.checked);
   }
 
   formatLabel(value: number) {

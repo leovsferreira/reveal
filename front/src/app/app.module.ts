@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal'
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { AppComponent } from './app.component';
 import { ImageEmbeddingComponent } from './image-embedding/image-embedding.component';
@@ -82,6 +83,7 @@ import { CombinedEmbeddingComponent } from './combined-embedding/combined-embedd
     MatInputModule,
     MatIconModule,
     MatTooltipModule,
+    MatCheckboxModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,

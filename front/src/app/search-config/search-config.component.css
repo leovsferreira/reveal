@@ -1,33 +1,33 @@
 .search-selector {
-    width: 135px;
-    position: absolute;
-    margin-left: 82px;
-    top: 171px;
+  width: 135px;
+  position: absolute;
+  margin-left: 82px;
+  top: 171px;
 }
 
 mat-slider {
-    width: 100%;
-    padding: 0px;
+  width: 100%;
+  padding: 0px;
 }
 
 ::ng-deep .mat-slider-track-fill {
-    background-color: #97a97c !important;
+  background-color: #97a97c !important;
 }
 
 ::ng-deep .mat-slider-thumb {
-    background-color: #97a97c !important;
+  background-color: #97a97c !important;
 }
 
 ::ng-deep .mat-slider-tick-active {
-    background-color: #97a97c !important;
+  background-color: #97a97c !important;
 }
 
 ::ng-deep .mat-slider-thumb-label {
-    background-color: #97a97c !important;
+  background-color: #97a97c !important;
 }
 
 mat-form-field {
-    width: 100%;
+  width: 100%;
 }
 
 ::ng-deep .mat-datepicker-toggle {
@@ -35,18 +35,18 @@ mat-form-field {
 }
 
 ::ng-deep .mat-calendar-body-selected {
-    background-color: rgb(151, 169, 124, .5) !important;
-    color: #fff;
+  background-color: rgb(151, 169, 124, .5) !important;
+  color: #fff;
 }
 
 ::ng-deep .mat-calendar-body-today {
-    background-color: rgb(151, 169, 124, .3) !important;
+  background-color: rgb(151, 169, 124, .3) !important;
 }
 
 @media (hover: hover) {
-    ::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
-        background-color: rgb(151, 169, 124, .2) !important;
-    }
+  ::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+      background-color: rgb(151, 169, 124, .2) !important;
+  }
 }
 
 .input-group {
@@ -67,8 +67,8 @@ mat-form-field {
 }
   
 .custom-slider {
-    flex: 1;
-    margin-right: 8px;
+  flex: 1;
+  margin-right: 8px;
 }
   
 mat-form-field {
@@ -78,4 +78,45 @@ mat-form-field {
 
 .custom-icon {
   color: rgba(149, 165, 166, 1) !important;
+}
+
+::ng-deep .mat-checkbox .mat-checkbox-frame, 
+::ng-deep .mat-checkbox .mat-checkbox-background,
+::ng-deep .mat-checkbox.mat-accent .mat-checkbox-background,
+::ng-deep .mat-checkbox .mat-checkbox-checkmark-path {
+    background-color: rgba(149, 165, 166, 1) !important;
+    border-color: rgba(149, 165, 166, 1) !important;
+}
+
+::ng-deep .mat-checkbox.mat-accent .mat-checkbox-ripple .mat-ripple-element {
+    background-color: rgba(151, 169, 124, 0.1) !important;
+}
+
+::ng-deep .mat-checkbox-checked.mat-accent .mat-checkbox-background,
+::ng-deep .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background {
+    background-color: #97a97c !important;
+    border-color: #97a97c !important;
+}
+
+::ng-deep .mat-checkbox-inner-container {
+    color: #97a97c !important;
+}
+
+::ng-deep .mat-checkbox-label {
+    color: rgba(0, 0, 0, 1) !important;
+    font-size: 16px;
+}
+
+/* For hover state */
+::ng-deep .mat-checkbox:not(.mat-checkbox-disabled).mat-accent .mat-checkbox-ripple .mat-ripple-element {
+    background-color: rgba(151, 169, 124, 0.2) !important;
+}
+
+/* For focus state */
+::ng-deep .mat-checkbox .mat-checkbox-frame {
+    border-color: #97a97c !important;
+}
+
+::ng-deep .mat-checkbox.mat-accent .mat-checkbox-frame {
+    border-color: #97a97c !important;
 }
