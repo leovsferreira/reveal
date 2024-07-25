@@ -26,6 +26,15 @@
     width: 32%;
     height: 100%;
     text-align: center;
+    background-color: #ffffff;
+}
+
+.combined-embedding {
+  width: 64%;
+  height: 100%;
+  text-align: center;
+  background-color: #ffffff;
+  position: absolute;
 }
 
 .gallery, .cloud {

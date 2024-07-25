@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ViewChild, TemplateRef } from '@angular/core'
 
 import { ImageEmbeddingComponent } from 'src/app/image-embedding/image-embedding.component';
 import { TextEmbeddingComponent } from 'src/app/text-embedding/text-embedding.component';
+import { CombinedEmbeddingComponent } from '../combined-embedding/combined-embedding.component';
 import { ForceGraphComponent } from 'src/app/force-graph/force-graph.component';
 import { ImageGalleryComponent } from 'src/app/image-gallery/image-gallery.component';
 import { ColorLegendComponent } from '../color-legend/color-legend.component';
@@ -47,12 +48,14 @@ export class HomeComponent implements AfterViewInit {
   public draggable = true;
   public similarityValue = 80;
   public savedBuckets: any[] = [];
+  public displayCombinedComponent: boolean = false;
   private rightClickCount: number = 1;
   private ctxMenuSavedBuckets: any = [];
   private ctxMenuInUseBuckets: any = [];
 
   @ViewChild(ImageEmbeddingComponent, { static: true }) private imageEmbedding!:ImageEmbeddingComponent;
   @ViewChild(TextEmbeddingComponent, { static: true }) private textEmbedding!: TextEmbeddingComponent;
+  @ViewChild(CombinedEmbeddingComponent, { static: true }) private combinendEmbedding!: CombinedEmbeddingComponent;
   @ViewChild(ForceGraphComponent, { static: true }) private forceGraph!: ForceGraphComponent;
   @ViewChild(ImageGalleryComponent, { static: true }) private imageGallery!: ImageGalleryComponent;
   @ViewChild(ColorLegendComponent, {static: true}) private coloLegend!: ColorLegendComponent;

@@ -89,7 +89,7 @@
     </div>
 
     <div class="visualizations">
-        <div class="embedding" id="image-embedding-div">
+        <div [style.z-index] = "!displayCombinedComponent ? '100' : '-100' " class="embedding" id="image-embedding-div">
             <app-image-embedding
             (imageLinkSelected) = "this.linkImagesAndTexts($event)"
             (clearEmbeddingsSelection) = "this.onSelectionsClear()"
@@ -101,12 +101,15 @@
                 <app-color-legend></app-color-legend>
             </div>
         </div>
-        <div class="embedding" id="text-embedding-div">
+        <div [style.z-index] = "!displayCombinedComponent ? '100' : '-100' " class="embedding" id="text-embedding-div">
             <app-text-embedding
             (textLinkSelected) = "this.linkImagesAndTexts($event)"
             (clearEmbeddingsSelection) = "this.onSelectionsClear()"
             (highlightWordCloud) = "this.highlightWordCloud($event)"
             ></app-text-embedding>
+        </div>
+        <div [style.z-index] = "!displayCombinedComponent ? '-100' : '100' " class="combined-embedding" id="combined-embedding-div">
+            <app-combined-embedding></app-combined-embedding>
         </div>
         <div class="mode-control" style="left: 68%;">
             <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'gallery' ? '#eee' : '#fff' " type="button" (click)="this.setMode('gallery')"

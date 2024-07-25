@@ -43,6 +43,7 @@ import { AuthService } from './shared/services/auth.service';
 import { BucketComponent } from './bucket/bucket.component';
 import { StateComponent } from './state/state.component';
 import { ModelGalleryComponent } from './model-gallery/model-gallery.component';
+import { CombinedEmbeddingComponent } from './combined-embedding/combined-embedding.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +63,7 @@ import { ModelGalleryComponent } from './model-gallery/model-gallery.component';
     BucketComponent,
     StateComponent,
     ModelGalleryComponent,
+    CombinedEmbeddingComponent,
   ],
   imports: [
     BrowserModule,
