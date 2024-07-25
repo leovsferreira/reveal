@@ -37,7 +37,7 @@
     color: rgba(149, 165, 166, 1);
     cursor: pointer;
     position: absolute;
-    left: calc(1% + 82px);
+    left: calc(1% + 84px);
     top: 10px;
     z-index: 100;
 }

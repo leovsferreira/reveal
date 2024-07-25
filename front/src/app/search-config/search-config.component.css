@@ -1,58 +1,21 @@
-.search-selector {
-  width: 135px;
-  position: absolute;
-  margin-left: 82px;
-  top: 171px;
+.settings-container {
+  margin: 20px;
 }
 
-mat-slider {
-  width: 100%;
-  padding: 0px;
+.settings-section {
+  margin-bottom: 20px;
 }
 
-::ng-deep .mat-slider-track-fill {
-  background-color: #97a97c !important;
-}
-
-::ng-deep .mat-slider-thumb {
-  background-color: #97a97c !important;
-}
-
-::ng-deep .mat-slider-tick-active {
-  background-color: #97a97c !important;
-}
-
-::ng-deep .mat-slider-thumb-label {
-  background-color: #97a97c !important;
-}
-
-mat-form-field {
-  width: 100%;
-}
-
-::ng-deep .mat-datepicker-toggle {
-  color: #97a97c !important;
-}
-
-::ng-deep .mat-calendar-body-selected {
-  background-color: rgb(151, 169, 124, .5) !important;
-  color: #fff;
-}
-
-::ng-deep .mat-calendar-body-today {
-  background-color: rgb(151, 169, 124, .3) !important;
-}
-
-@media (hover: hover) {
-  ::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
-      background-color: rgb(151, 169, 124, .2) !important;
-  }
+.divider {
+  border: 0;
+  height: 1px;
+  background: #97a97c;
+  margin: 20px 0;
 }
 
 .input-group {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
 }
   
 .input-label {
@@ -119,4 +82,41 @@ mat-form-field {
 
 ::ng-deep .mat-checkbox.mat-accent .mat-checkbox-frame {
     border-color: #97a97c !important;
+}
+
+/* Slider styling */
+::ng-deep .mat-slider-track-fill {
+  background-color: #97a97c !important;
+}
+
+::ng-deep .mat-slider-thumb {
+  background-color: #97a97c !important;
+}
+
+::ng-deep .mat-slider-tick-active {
+  background-color: #97a97c !important;
+}
+
+::ng-deep .mat-slider-thumb-label {
+  background-color: #97a97c !important;
+}
+
+/* Datepicker styling */
+::ng-deep .mat-datepicker-toggle {
+  color: #97a97c !important;
+}
+
+::ng-deep .mat-calendar-body-selected {
+  background-color: rgb(151, 169, 124, .5) !important;
+  color: #fff;
+}
+
+::ng-deep .mat-calendar-body-today {
+  background-color: rgb(151, 169, 124, .3) !important;
+}
+
+@media (hover: hover) {
+  ::ng-deep .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover>.mat-calendar-body-cell-content:not(.mat-calendar-body-selected):not(.mat-calendar-body-comparison-identical) {
+      background-color: rgb(151, 169, 124, .2) !important;
+  }
 }

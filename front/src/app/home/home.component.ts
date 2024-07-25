@@ -611,4 +611,8 @@ export class HomeComponent implements AfterViewInit {
     const res = await this.api.getInfo(this.InfoQuery);
     this.imageGallery.info = res;
   }
+
+  onEmbeddingToggle(event: any) {
+    this.displayCombinedComponent = event;
+  }
 }
