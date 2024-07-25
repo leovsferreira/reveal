@@ -2,7 +2,7 @@
     <div *ngFor="let bucket of bucketsInUse">
         <div [ngDraggable]="true" (dragover)="this.allowDrop($event, bucket.id)" class="bucket-wrapper" id="inusebucket-div-{{bucket.id}}" [attr.data-bucketid]="bucket.id" (contextmenu)="onRightClick(bucket.id)"> 
             <div class="bucket">
-                <span style="color:rgb(0, 175, 193);" class="fas fa-box-open fa-2xl"></span>
+                <span style="color:#97a97c;" class="fas fa-box-open fa-2xl"></span>
             </div>
             <div class="bucket-title">
                 {{bucket.name}}

@@ -1,10 +1,9 @@
 <mat-icon matTooltip="The exploration graph displays nodes that represent searches or operations, generated via search bar, image/word selections, or set operations. Each node type has distinct features, as shown in the legend after the first search. Nodes retain full search results, allowing users to save and resume their process by creating new 'states' displayed in the side menu" class="help-icon">help</mat-icon>
 <ul *ngIf="this.forceGraphData.nodes.length > 0" class="legend">
     <li>Search bar <span class="bar-search"></span></li>
-    <li>Visualizations search <span class="interface"></span></li>
-    <li>Set operations <span class="set"></span></li>
-    <li>Selected node <span class="selected-node"></span> </li>
-    <li>Hovered node <span class="hovered-node"></span> </li>
-    <li>Parent node <span class="parent-node"></span> </li>
+    <li>Visualization search <span class="interface"></span></li>
+    <li>Set operation <span class="set"></span></li>
+    <li>Selected<span class="selected-node"></span> </li>
+    <li>Parent<span class="parent-node"></span> </li>
 </ul>
 <div class="fill" #forceGraph></div>

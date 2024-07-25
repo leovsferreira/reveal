@@ -7,25 +7,40 @@
     color: rgba(149, 165, 166, 1);
     cursor: pointer;
     position: absolute;
-    right: 10px;
-    top: calc(48% + 114px);
+    right: 5px;
+    top: calc(46% + 118px);
     z-index: 100;
 }
 
+/* Updated colors */
+.legend .bar-search { background-color: #97a97c; } /* Darker shade of the main color */
+.legend .interface { background-color: #7c97a9; } /* Main color */
+.legend .set { background-color: #977ca9; } /* Complementary color to main color */
+.legend .selected-node { background-color: #ffcc00; } /* Bright yellow for high visibility */
+.legend .parent-node { background-color: #ffffff; border: 3px solid #ff0000; } /* Bright orange with red border for high visibility */
+
+
 /* basic positioning */
-.legend { list-style: none;
+.legend { 
+    list-style: none;
     width: 227px;
-    height: 120px;
+    height: 140px; /* Adjusted height to fit all items */
     position: absolute;
     right: 0px;
 }
 
-.legend li { float: right; margin-right: 10px; }
-.legend span { border: 1px solid #ccc; float: right; width: 14px; height: 14px; margin: 5px; border-radius: 30px; }
-/* your colors */
-.legend .bar-search { background-color: #4e79a7; }
-.legend .interface { background-color: #f28e2c; }
-.legend .set { background-color: #e15759; }
-.legend .selected-node { background-color: #bab0ab; }
-.legend .hovered-node { background-color: #59a14f; }
-.legend .parent-node { background-color: #FFFFFF; border: 3px solid #edc949}
+.legend li { 
+    display: flex; /* Ensure each item is on a new line */
+    margin-right: 10px;
+    clear: both; /* Clear floats to ensure items stack vertically */
+    float: right;
+}
+
+.legend span { 
+    border: 1px solid #ccc;
+    width: 14px;
+    height: 14px;
+    border-radius: 30px;
+    margin-left: 10px; /* Ensure some space between text and span */
+    margin-top: 7px;
+}

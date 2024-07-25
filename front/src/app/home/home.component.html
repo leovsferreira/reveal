@@ -7,7 +7,7 @@
                 <div *ngFor="let bucket of this.bucket.savedBuckets" style="margin-bottom: 10px;">
                     <div class="bucket-wrapper" id="savedbucket-div-{{bucket.id}}" [attr.data-bucketid]="bucket.id" (contextmenu)="onRightClick(bucket.id, 'bucket')"> 
                         <div class="bucket">
-                            <span style="color:rgb(0, 175, 193);" class="fas fa-box-open"></span>
+                            <span style="color:#97a97c;" class="fas fa-box-open"></span>
                         </div>
                         <div class="bucket-title">
                             {{bucket.name}}
@@ -23,7 +23,7 @@
                 <div *ngFor="let state of this.state.savedStates" style="margin-bottom: 10px;">
                     <div class="state-wrapper" id="state-div-{{state.id}}" [attr.data-stateid]="state.id" (contextmenu)="onRightClick(state.id, 'state')"> 
                         <div class="state">
-                            <span style="color:rgb(0, 175, 193);" class="fas fa-square-share-nodes"></span>
+                            <span style="color:#97a97c;" class="fas fa-square-share-nodes"></span>
                         </div>
                         <div class="state-title">
                             {{state.name}}
@@ -112,12 +112,12 @@
             <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'gallery' ? '#eee' : '#fff' " type="button" (click)="this.setMode('gallery')"
                 matTooltip="Image gallery displaying query results in descending order of similarity. Select images to save them along with their text descriptions in multimodal data buckets. Click on them to see the whole image and its text.">
                 <span class="fa-solid fa-image"
-                [style.color]="this.wichModeSelected == 'gallery' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+                [style.color]="this.wichModeSelected == 'gallery' ? '#97a97c' : 'rgba(149, 165, 166, 1)' "></span>
             </button>
             <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'cloud' ? '#eee' : '#fff' " type="button" (click)="this.setMode('cloud')"
                 matTooltip="Word cloud presenting the top 20 concepts based on their similarity to the content of the given query. Visualize key terms related to your search.">
                 <span class="fa-solid fa-cloud"
-                [style.color]="this.wichModeSelected == 'cloud' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+                [style.color]="this.wichModeSelected == 'cloud' ? '#97a97c' : 'rgba(149, 165, 166, 1)' "></span>
             </button>
         </div>
         <mat-icon matTooltip="To display the image gallery and word cloud, click on the image icon for the gallery and the cloud icon for the word cloud." class="help-icon">help</mat-icon>
@@ -149,7 +149,7 @@
     <div class="add-bucket">
         <button type="button" style="background-color:rgb(238, 238, 238) !important;" class="btn btn-custom" (click)="openModal(templateBucket)"
             matTooltip="Create a new bucket to store multimodal data, including images and their corresponding text.">
-            <i style="color: rgb(0, 175, 193);" class="fa-solid fa-plus"></i>
+            <i style="color: #97a97c;" class="fa-solid fa-plus"></i>
         </button>   
     </div>
 
@@ -167,7 +167,7 @@
         <div class="modal-header">
             <h1 class="modal-title pull-left" style="color: #808080">New bucket</h1>
             <button type="button"  class="btn btn-custom" style="background-color:rgb(238, 238, 238) !important;" aria-label="Close" (click)="modalRef.hide()">
-                <i style="color: rgb(0, 175, 193);" class="fa-solid fa-xmark"></i>
+                <i style="color: #97a97c;" class="fa-solid fa-xmark"></i>
             </button>
         </div>
         <div class="modal-body">
@@ -189,7 +189,7 @@
         <div class="modal-header">
             <h1 class="modal-title pull-left" style="color: #808080">Save State</h1>
             <button type="button"  class="btn btn-custom" style="background-color:rgb(238, 238, 238) !important;" aria-label="Close" (click)="modalRef.hide()">
-                <i style="color: rgb(0, 175, 193);" class="fa-solid fa-xmark"></i>
+                <i style="color: #97a97c;" class="fa-solid fa-xmark"></i>
             </button>
         </div>
         <div class="modal-body">

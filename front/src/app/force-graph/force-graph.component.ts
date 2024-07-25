@@ -85,7 +85,7 @@ export class ForceGraphComponent implements OnInit {
 
     .nodeColor((node: any) => this.setNodeColor(node))
     .nodeCanvasObject((node: any, ctx: any) => this.setNodeShape(node, this.setNodeColor(node), ctx, this.parentNode))
-    .nodePointerAreaPaint(this.setNodeShape)
+    .nodePointerAreaPaint((node: any, color: any, ctx: any) => this.setNodeShape(node, color, ctx, this.parentNode))
     .onNodeHover(node =>  { this.hoverNode = node || null })
     .nodeLabel((node:any)  =>  this.buildTooltip(node, node.queryType))
     .enableNodeDrag(false);
@@ -365,16 +365,14 @@ export class ForceGraphComponent implements OnInit {
 
   setNodeColor(node: any) {
     if(this.selectedNodes.has(node)) {
-      return '#bab0ab'
+      return '#ffcc00'
     } else {
-      if(node === this.hoverNode) return '#59a14f';
-      else if(node.from === 'interface') return '#f28e2c';
-      else if(node.from === 'set') return '#e15759';
-      else return '#4e79a7'
+      if(node.from === 'interface') return '#7c97a9';
+      else if(node.from === 'set') return '#977ca9';
+      else return '#97a97c'
     }
   }
-
-
+ 
   setNodeShape(node: any, color: any, ctx: any, parentNode: any) {
     let isParent = false;
     if(typeof(parentNode) !== 'number') {
@@ -385,27 +383,29 @@ export class ForceGraphComponent implements OnInit {
     const x = node.x;
     const y = node.y;
     const iteractionType = node.iteractionType;
+    const radius = this.selectedNodes.has(node) || node === this.hoverNode ? 5 : 4; // Adjust radius
+
     [
       () => { 
               //squares with node sequence
               const width = 8;
               const height = 8;
-              const radius = 2; // Radius for rounded corners
+              const roundedRadius = 2; // Radius for rounded corners
               
               const x = node.x - width / 2;
               const y = node.y - height / 2;
               
-              ctx.fillStyle = "#af7aa1";
+              ctx.fillStyle = "#98876a";
               ctx.beginPath();
-              ctx.moveTo(x + radius + 2, y + 2);
-              ctx.lineTo(x + width - radius + 2, y + 2);
-              ctx.arcTo(x + width + 2, y + 2, x + width + 2, y + radius + 2, radius);
-              ctx.lineTo(x + width + 2, y + height - radius + 2);
-              ctx.arcTo(x + width + 2, y + height + 2, x + width - radius + 2, y + height + 2, radius);
-              ctx.lineTo(x + radius + 2, y + 2 + height);
-              ctx.arcTo(x + 2, y + 2 + height, x + 2, y + 2 + height - radius, radius);
-              ctx.lineTo(x + 2, y + 2 + radius);
-              ctx.arcTo(x + 2, y + 2, x + 2 + radius, y + 2, radius);
+              ctx.moveTo(x + roundedRadius + 2, y + 2);
+              ctx.lineTo(x + width - roundedRadius + 2, y + 2);
+              ctx.arcTo(x + width + 2, y + 2, x + width + 2, y + roundedRadius + 2, roundedRadius);
+              ctx.lineTo(x + width + 2, y + height - roundedRadius + 2);
+              ctx.arcTo(x + width + 2, y + height + 2, x + width - roundedRadius + 2, y + height + 2, roundedRadius);
+              ctx.lineTo(x + roundedRadius + 2, y + 2 + height);
+              ctx.arcTo(x + 2, y + 2 + height, x + 2, y + 2 + height - roundedRadius, roundedRadius);
+              ctx.lineTo(x + 2, y + 2 + roundedRadius);
+              ctx.arcTo(x + 2, y + 2, x + 2 + roundedRadius, y + 2, roundedRadius);
               ctx.fill();
               
               ctx.fillStyle = 'white';
@@ -416,14 +416,14 @@ export class ForceGraphComponent implements OnInit {
               //
 
               if(isParent) {
-                ctx.fillStyle = "#edc949"
+                ctx.fillStyle = "#ff0000"
                 ctx.beginPath();
-                ctx.arc(x, y, 6, 0, 2 * Math.PI, false);
+                ctx.arc(x, y, radius + 1, 0, 2 * Math.PI, false);
                 ctx.fill();
               }
               ctx.fillStyle = color;
               ctx.beginPath();
-              ctx.arc(x, y, 5, 0, 2 * Math.PI, false);
+              ctx.arc(x, y, radius, 0, 2 * Math.PI, false); // Use the adjusted radius
               ctx.fill(); 
 
               ctx.fillStyle = "#FFFFFF"
@@ -444,7 +444,7 @@ export class ForceGraphComponent implements OnInit {
   }
 
   distance = (node1: any, node2: any) => {
-    return Math.sqrt(Math.pow(node1.x - node2.x, 2) + Math.pow(node1.y - node2.y, 2));
+    return Math.sqrt(Math.pow(node1.x - node2.x, 2) + Math.pow(node2.y - node2.y, 2));
   };
 
   chooseSetOperations(type: any) {
