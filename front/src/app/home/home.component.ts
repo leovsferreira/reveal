@@ -358,6 +358,29 @@ export class HomeComponent implements AfterViewInit {
       }
   }
 
+  highlightCombinedEmbeddingFromText(selectedPoints: any) {
+    const modifiedSelectedPoints = selectedPoints.map((value: number) => value + this.combinedEmbedding.cutIndex);
+    this.combinedEmbedding.wasCtrlKey = false;
+    this.combinedEmbedding.selectedPointsTexts = [];
+    this.combinedEmbedding.scatterGl.select([]);
+    this.combinedEmbedding.selectedPointsTexts = modifiedSelectedPoints;
+    this.combinedEmbedding.scatterGl.select(modifiedSelectedPoints);
+    this.combinedEmbedding.wasCtrlKey = true;
+
+    this.combinedEmbedding.colorPoints();
+  }
+
+  highlightCombinedEmbeddingFromImage(selectedPoints: any) {
+    this.combinedEmbedding.wasCtrlKey = false;
+    this.combinedEmbedding.selectedPointsImages = [];
+    this.combinedEmbedding.scatterGl.select([]);
+    this.combinedEmbedding.selectedPointsImages = selectedPoints;
+    this.combinedEmbedding.scatterGl.select(selectedPoints);
+    this.combinedEmbedding.wasCtrlKey = true;
+
+    this.combinedEmbedding.colorPoints();
+  }
+
   toggleEmbeddingsFromCombined(obj: any) {
     this.textEmbedding.wasCtrlKey = false;
     this.textEmbedding.selectedPoints = [];

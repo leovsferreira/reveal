@@ -17,6 +17,7 @@ export class ImageEmbeddingComponent implements OnInit {
   @Output() imageLinkSelected = new EventEmitter<any>();
   @Output() clearEmbeddingsSelection = new EventEmitter<string>();
   @Output() highlightImageGallery = new EventEmitter<any>();
+  @Output() highlightCombinedEmbedding = new EventEmitter<any>();
 
   private imageEmbedding: any;
   public selectedPoints: any = [];
@@ -59,11 +60,13 @@ export class ImageEmbeddingComponent implements OnInit {
             this.highlightTexts(this.selectedPoints);
             this.scatterGl.select(this.selectedPoints);
             this.highlightImageGallery.emit(this.selectedPoints);
+            this.highlightCombinedEmbedding.emit(this.selectedPoints);
           } else {
             if(points.length == 0) {
               this.wasCtrlKey = false;
               this.clearEmbeddingsSelection.emit();
-              this.highlightImageGallery.emit([])
+              this.highlightImageGallery.emit([]);
+              this.highlightCombinedEmbedding.emit([]);
             };
           }
           this.colorPoints();

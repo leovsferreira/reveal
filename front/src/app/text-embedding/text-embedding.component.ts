@@ -14,6 +14,7 @@ export class TextEmbeddingComponent implements OnInit {
   @Output() textLinkSelected = new EventEmitter<any>();
   @Output() clearEmbeddingsSelection = new EventEmitter();
   @Output() highlightWordCloud = new EventEmitter();
+  @Output() highlightCombinedEmbedding = new EventEmitter<any>();
   
   private textEmbedding: any;
   private colorScale: any = d3.scaleSequential(d3.interpolateReds);
@@ -49,11 +50,13 @@ export class TextEmbeddingComponent implements OnInit {
             this.highlightImages(this.selectedPoints);
             this.scatterGl.select(this.selectedPoints)
             this.highlightWordCloud.emit(this.selectedPoints);
+            this.highlightCombinedEmbedding.emit(this.selectedPoints);
           } else {
             if(points.length == 0) {
               this.wasCtrlKey = false;
               this.clearEmbeddingsSelection.emit();
               this.highlightWordCloud.emit([])
+              this.highlightCombinedEmbedding.emit([]);
             };
           }
           this.colorPoints();

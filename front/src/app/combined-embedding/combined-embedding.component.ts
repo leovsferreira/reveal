@@ -27,11 +27,11 @@ export class CombinedEmbeddingComponent implements OnInit {
   private tooltip: any;
   private clientX: number = 0;
   private clientY: number = 0;
-  private cutIndex: any = null;
+  public cutIndex: any = null;
   public scatterGl: any = null;
   public dataset: any;
   public wichModeSelected: string = "pan";
-  private wasCtrlKey: boolean = false;
+  public wasCtrlKey: boolean = false;
   public highlightedIndicesImages: any = [];
   public highlightedIndicesTexts: any = [];
   constructor(public global: GlobalService) { }
@@ -237,6 +237,10 @@ export class CombinedEmbeddingComponent implements OnInit {
       this.scatterGl.select([]);
       this.colorPoints();
     }
+  }
+
+  toggleImagesAndText(obj: any) {
+
   }
   
   toggleTexts(obj: any) {

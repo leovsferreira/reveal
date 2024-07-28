@@ -95,6 +95,7 @@
             (imageLinkSelected) = "this.linkImagesAndTexts($event)"
             (clearEmbeddingsSelection) = "this.onSelectionsClear()"
             (highlightImageGallery) = "this.highlightImageGallery($event)"
+            (highlightCombinedEmbedding) = "this.highlightCombinedEmbeddingFromImage($event)"
             ></app-image-embedding>
         </div>
         <div [ngClass]="!displayCombinedComponent ? 'legend' : 'legend-far'">
@@ -107,6 +108,7 @@
             (textLinkSelected) = "this.linkImagesAndTexts($event)"
             (clearEmbeddingsSelection) = "this.onSelectionsClear()"
             (highlightWordCloud) = "this.highlightWordCloud($event)"
+            (highlightCombinedEmbedding) = "this.highlightCombinedEmbeddingFromText($event)"
             ></app-text-embedding>
         </div>
         <div [style.z-index] = "!displayCombinedComponent ? '-100' : '100' " class="combined-embedding" id="combined-embedding-div">
