@@ -140,9 +140,14 @@ export class HomeComponent implements AfterViewInit {
         items: menuItemsInterfaceSearch,
         select: this.onInterfaceSearch.bind(this)
       };
+      let menuOptionsCombinedEmbedding: ContextMenuModel = {
+        target: '#combined-embedding-div',
+        items: menuItemsInterfaceSearch,
+        select: this.onInterfaceSearch.bind(this)
+      };
       const textEmbedding: ContextMenu = new ContextMenu(menuOptionsTextEmbedding, '#contextmenu-text-embedding')
       const ImageEmbedding: ContextMenu = new ContextMenu(menuOptionsImageEmbedding, '#contextmenu-image-embedding')
-      
+      const CombinedEmbedding: ContextMenu = new ContextMenu(menuOptionsCombinedEmbedding, '#contextmenu-combined-embedding')
       //inicializa menu para a galeria de imagens ou palavras
       let menuOptionsGalleries: ContextMenuModel = {
         target: '#gallery-div',
@@ -384,6 +389,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   onInterfaceSearch(args: MenuEventArgs) {
+    console.log(args)
     const selectedImagesIds = this.imageEmbedding.selectedPoints;
     const selectedTextsIds = this.textEmbedding.selectedPoints;
 
