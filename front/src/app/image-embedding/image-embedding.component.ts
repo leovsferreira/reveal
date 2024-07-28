@@ -75,8 +75,13 @@ export class ImageEmbeddingComponent implements OnInit {
             const clientY = this.clientY;
             const imagePath = this.dataset.labelPaths[point][0];
             this.tooltip = tippy(this.imageEmbeddingDiv.nativeElement, {
-              theme: 'translucent'
+              theme: 'translucent',
+              arrow: false,
+              onShow(instance: any) {
+                instance.popper.querySelector('.tippy-box').classList.add('transparent-background');
+              }
             });
+            
             this.tooltip.setProps({
               content: `<img style="max-width: 128px; max-height: 128px;" src="https://storage.googleapis.com/trabalho_final/dataset/images_USA/${imagePath}"></img>`,
               allowHTML: true,
@@ -116,6 +121,7 @@ export class ImageEmbeddingComponent implements OnInit {
         label
       });
     }
+
     this.dataset = new ScatterGL.Dataset(dataPoints, metadata);
     this.dataset["labelPaths"] = data.labelPaths;
     this.dataset["textIds"] = data.textIds;

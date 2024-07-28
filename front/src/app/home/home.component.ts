@@ -55,7 +55,7 @@ export class HomeComponent implements AfterViewInit {
 
   @ViewChild(ImageEmbeddingComponent, { static: true }) private imageEmbedding!:ImageEmbeddingComponent;
   @ViewChild(TextEmbeddingComponent, { static: true }) private textEmbedding!: TextEmbeddingComponent;
-  @ViewChild(CombinedEmbeddingComponent, { static: true }) private combinendEmbedding!: CombinedEmbeddingComponent;
+  @ViewChild(CombinedEmbeddingComponent, { static: true }) private combinedEmbedding!: CombinedEmbeddingComponent;
   @ViewChild(ForceGraphComponent, { static: true }) private forceGraph!: ForceGraphComponent;
   @ViewChild(ImageGalleryComponent, { static: true }) private imageGallery!: ImageGalleryComponent;
   @ViewChild(ColorLegendComponent, {static: true}) private coloLegend!: ColorLegendComponent;
@@ -193,6 +193,7 @@ export class HomeComponent implements AfterViewInit {
       this.forceGraph.addNode('searchbar');
       this.imageEmbedding.setupImageEmbedding(res.images);
       this.textEmbedding.setupTextEmbedding(res.texts);
+      this.combinedEmbedding.setupCombinedEmbedding(res.images, res.texts);
       this.imageGallery.updateImageGallery(res.images);
       this.imageGallery.tabsCounter = 0;
       this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
@@ -223,6 +224,7 @@ export class HomeComponent implements AfterViewInit {
       if(res.images.similarities.length > 0 && res.texts.similarities.length > 0) {
         this.imageEmbedding.setupImageEmbedding(res.images);
         this.textEmbedding.setupTextEmbedding(res.texts);
+        this.combinedEmbedding.setupCombinedEmbedding(res.images, res.texts);
         this.imageGallery.updateImageGallery(res.images);
       this.imageGallery.tabsCounter = 0;
         this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
@@ -263,6 +265,7 @@ export class HomeComponent implements AfterViewInit {
     //starta os embeddings
     this.imageEmbedding.setupImageEmbedding(res.images);
     this.textEmbedding.setupTextEmbedding(res.texts);
+    this.combinedEmbedding.setupCombinedEmbedding(res.images, res.texts);
     this.imageGallery.updateImageGallery(res.images);
       this.imageGallery.tabsCounter = 0;
     this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
@@ -343,10 +346,12 @@ export class HomeComponent implements AfterViewInit {
 
   toggleEmbeddingImageFromGallery(obj: any) {
     this.imageEmbedding.toggleImages(obj);
+    this.combinedEmbedding.toggleImages(obj);
   }
 
   toggleEmbeddingTextFromCloud(obj: any) {
-    this.textEmbedding.toggleText(obj)
+    this.textEmbedding.toggleText(obj);
+    this.combinedEmbedding.toggleTexts(obj);
   }
 
   toggleConfigVisibility() {
@@ -577,6 +582,7 @@ export class HomeComponent implements AfterViewInit {
   resetAll(from: string = 'node') {
     this.imageEmbedding.clear();
     this.textEmbedding.clear();
+    this.combinedEmbedding.clear();
     this.coloLegend.clear();
     this.imageGallery.clear();
     this.wordCloud.clear();

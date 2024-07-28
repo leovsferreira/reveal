@@ -110,7 +110,10 @@
             ></app-text-embedding>
         </div>
         <div [style.z-index] = "!displayCombinedComponent ? '-100' : '100' " class="combined-embedding" id="combined-embedding-div">
-            <app-combined-embedding></app-combined-embedding>
+            <app-combined-embedding
+            (highlightImageGallery) = "this.highlightImageGallery($event)"
+            (highlightWordCloud) = "this.highlightWordCloud($event)"
+            ></app-combined-embedding>
         </div>
         <div class="mode-control" style="left: 68%;">
             <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'gallery' ? '#eee' : '#fff' " type="button" (click)="this.setMode('gallery')"

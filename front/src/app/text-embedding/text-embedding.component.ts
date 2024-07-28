@@ -1,6 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { GlobalService } from 'src/app/shared/global.service';
-import * as THREE from 'three';
 import * as ScatterGL from 'scatter-gl';
 import * as d3 from 'd3';
 
