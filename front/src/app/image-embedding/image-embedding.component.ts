@@ -27,7 +27,7 @@ export class ImageEmbeddingComponent implements OnInit {
   public scatterGl: any = null;
   public dataset: any;
   public wichModeSelected: string = "pan";
-  private wasCtrlKey: boolean = false;
+  public wasCtrlKey: boolean = false;
   public highlitedIndices: any = [];
   constructor(public global: GlobalService) { }
 
@@ -178,6 +178,7 @@ export class ImageEmbeddingComponent implements OnInit {
   }
 
   colorPoints() {
+    console.log(this.selectedPoints)
     const data = this.dataset['similarities'];
     // @ts-ignore
     this.colorScale.domain( [this.dataset["similarityValue"], Math.max( ...data )] );

@@ -21,7 +21,7 @@ export class TextEmbeddingComponent implements OnInit {
   public dataset: any;
   public wichModeSelected: string = "pan";
   public selectedPoints: any = [];
-  private wasCtrlKey: boolean = false;
+  public wasCtrlKey: boolean = false;
   public highlitedIndices: any = [];
   constructor(public global: GlobalService) { }
 

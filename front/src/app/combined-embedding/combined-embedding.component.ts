@@ -18,6 +18,7 @@ export class CombinedEmbeddingComponent implements OnInit {
   @Output() clearEmbeddingsSelection = new EventEmitter<string>();
   @Output() highlightImageGallery = new EventEmitter<any>();
   @Output() highlightWordCloud = new EventEmitter<any>();
+  @Output() toggleEmbeddings = new EventEmitter<any>();
 
   private imageEmbedding: any;
   public selectedPointsImages: any = [];
@@ -70,14 +71,16 @@ export class CombinedEmbeddingComponent implements OnInit {
             this.scatterGl.select([...this.selectedPointsImages, ...this.selectedPointsTexts]);
             this.highlightImageGallery.emit(this.selectedPointsImages);
             const modifiedSelectedPointsTexts = this.selectedPointsTexts.map((value: number) => value - this.cutIndex);
-            console.log(this.selectedPointsTexts, modifiedSelectedPointsTexts)
             this.highlightWordCloud.emit(modifiedSelectedPointsTexts);
+            this.toggleEmbeddings.emit({selectedPointsTexts: modifiedSelectedPointsTexts,
+                                        selectedPointsImages: this.selectedPointsImages})
           } else {
             if(points.length == 0) {
               this.wasCtrlKey = false;
               this.clearEmbeddingsSelection.emit();
               this.highlightImageGallery.emit([]);
               this.highlightWordCloud.emit([]);
+              this.toggleEmbeddings.emit({selectedPointsTexts: [], selectedPointsImages: []})
             };
           }
           this.colorPoints();

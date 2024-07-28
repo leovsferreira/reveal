@@ -358,6 +358,25 @@ export class HomeComponent implements AfterViewInit {
       }
   }
 
+  toggleEmbeddingsFromCombined(obj: any) {
+    this.textEmbedding.wasCtrlKey = false;
+    this.textEmbedding.selectedPoints = [];
+    this.textEmbedding.scatterGl.select([]);
+    this.textEmbedding.selectedPoints = obj.selectedPointsTexts;
+    this.textEmbedding.scatterGl.select(obj.selectedPointsTexts);
+    this.textEmbedding.wasCtrlKey = true;
+
+    this.imageEmbedding.wasCtrlKey = false;
+    this.imageEmbedding.selectedPoints = [];
+    this.imageEmbedding.scatterGl.select([]);
+    this.imageEmbedding.selectedPoints = obj.selectedPointsImages;
+    this.imageEmbedding.scatterGl.select(obj.selectedPointsImages);
+    this.imageEmbedding.wasCtrlKey = true;
+    
+    this.textEmbedding.colorPoints();
+    this.imageEmbedding.colorPoints();
+  }
+
   toggleEmbeddingImageFromGallery(obj: any) {
     this.imageEmbedding.toggleImages(obj);
     this.combinedEmbedding.toggleImages(obj);
