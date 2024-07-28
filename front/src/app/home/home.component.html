@@ -97,7 +97,7 @@
             (highlightImageGallery) = "this.highlightImageGallery($event)"
             ></app-image-embedding>
         </div>
-        <div class="legend">
+        <div [ngClass]="!displayCombinedComponent ? 'legend' : 'legend-far'">
             <div class="d3-color-legend">
                 <app-color-legend></app-color-legend>
             </div>
