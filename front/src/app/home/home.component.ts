@@ -341,7 +341,16 @@ export class HomeComponent implements AfterViewInit {
         this.textEmbedding.scatterGl.select([]);
         this.textEmbedding.highlightImages([]);
       }
-      
+
+      //clearing everything for the combined embedding
+      if(this.combinedEmbedding.scatterGl) {
+        this.highlightWordCloud([]);
+        this.combinedEmbedding.selectedPointsImages = [];
+        this.combinedEmbedding.selectedPointsTexts = [];
+        this.combinedEmbedding.highlightedIndicesImages = [];
+        this.combinedEmbedding.highlightedIndicesTexts = [];
+        this.combinedEmbedding.scatterGl.select([]);
+      }
   }
 
   toggleEmbeddingImageFromGallery(obj: any) {

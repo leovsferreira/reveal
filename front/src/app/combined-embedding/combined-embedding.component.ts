@@ -69,7 +69,9 @@ export class CombinedEmbeddingComponent implements OnInit {
             } 
             this.scatterGl.select([...this.selectedPointsImages, ...this.selectedPointsTexts]);
             this.highlightImageGallery.emit(this.selectedPointsImages);
-            this.highlightWordCloud.emit(this.selectedPointsTexts);
+            const modifiedSelectedPointsTexts = this.selectedPointsTexts.map((value: number) => value - this.cutIndex);
+            console.log(this.selectedPointsTexts, modifiedSelectedPointsTexts)
+            this.highlightWordCloud.emit(modifiedSelectedPointsTexts);
           } else {
             if(points.length == 0) {
               this.wasCtrlKey = false;
@@ -117,7 +119,6 @@ export class CombinedEmbeddingComponent implements OnInit {
               theme: 'translucent',
               arrow: false,
               onShow(instance: any) {
-                console.log(instance.popper.querySelector('.tippy-box'))
                 instance.popper.querySelector('.tippy-box').classList.add('transparent-background');
               }
             });
