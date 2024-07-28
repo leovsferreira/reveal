@@ -383,63 +383,70 @@ export class ForceGraphComponent implements OnInit {
     const x = node.x;
     const y = node.y;
     const iteractionType = node.iteractionType;
-    const radius = this.selectedNodes.has(node) || node === this.hoverNode ? 5 : 4; // Adjust radius
-
+    const radius = this.selectedNodes.has(node) || node === this.hoverNode ? 8 : 6; // Adjust radius
     [
       () => { 
-              //squares with node sequence
-              const width = 8;
-              const height = 8;
-              const roundedRadius = 2; // Radius for rounded corners
-              
-              const x = node.x - width / 2;
-              const y = node.y - height / 2;
-              
-              ctx.fillStyle = "#98876a";
-              ctx.beginPath();
-              ctx.moveTo(x + roundedRadius + 2, y + 2);
-              ctx.lineTo(x + width - roundedRadius + 2, y + 2);
-              ctx.arcTo(x + width + 2, y + 2, x + width + 2, y + roundedRadius + 2, roundedRadius);
-              ctx.lineTo(x + width + 2, y + height - roundedRadius + 2);
-              ctx.arcTo(x + width + 2, y + height + 2, x + width - roundedRadius + 2, y + height + 2, roundedRadius);
-              ctx.lineTo(x + roundedRadius + 2, y + 2 + height);
-              ctx.arcTo(x + 2, y + 2 + height, x + 2, y + 2 + height - roundedRadius, roundedRadius);
-              ctx.lineTo(x + 2, y + 2 + roundedRadius);
-              ctx.arcTo(x + 2, y + 2, x + 2 + roundedRadius, y + 2, roundedRadius);
-              ctx.fill();
-              
-              ctx.fillStyle = 'white';
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.font = '4px Roboto';
-              ctx.fillText(node.id + 1, x + 2 + width / 2, y + 2 + height / 2);
-              //
+              // Draw the square with interaction type inside it, only if the node was originated by a set operation
+              if (iteractionType !== 0) {
+                const width = 13; // Square width
+                const height = 13; // Square height
+                const offset = 2; // Offset to make the square touch the node
+                const roundedRadius = 2; // Radius for rounded corners
 
-              if(isParent) {
-                ctx.fillStyle = "#ff0000"
+                const rectX = x + radius - offset;
+                const rectY = y + radius - offset;
+
+                // Draw the square with white background and thin black border with rounded corners
+                ctx.fillStyle = "#FFFFFF";
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 0.5; // Thinner border
+                ctx.beginPath();
+                ctx.moveTo(rectX + roundedRadius, rectY);
+                ctx.lineTo(rectX + width - roundedRadius, rectY);
+                ctx.arcTo(rectX + width, rectY, rectX + width, rectY + roundedRadius, roundedRadius);
+                ctx.lineTo(rectX + width, rectY + height - roundedRadius);
+                ctx.arcTo(rectX + width, rectY + height, rectX + width - roundedRadius, rectY + height, roundedRadius);
+                ctx.lineTo(rectX + roundedRadius, rectY + height);
+                ctx.arcTo(rectX, rectY + height, rectX, rectY + height - roundedRadius, roundedRadius);
+                ctx.lineTo(rectX, rectY + roundedRadius);
+                ctx.arcTo(rectX, rectY, rectX + roundedRadius, rectY, roundedRadius);
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw the interaction type symbol inside the square in black
+                ctx.fillStyle = 'black';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = '9px Roboto'; // Adjusted font size for interaction type
+                if (iteractionType == 1) {
+                  ctx.fillText('ꓵ', rectX + width / 2, rectY + height / 2);
+                } else if (iteractionType == 2) {
+                  ctx.fillText('U', rectX + width / 2, rectY + height / 2);
+                } else if (iteractionType == 3) {
+                  ctx.fillText('-', rectX + width / 2, rectY + height / 2);
+                }
+              }
+              // Draw a red circle around the node if it is a parent
+              if (isParent) {
+                ctx.fillStyle = "#ff0000";
                 ctx.beginPath();
                 ctx.arc(x, y, radius + 1, 0, 2 * Math.PI, false);
                 ctx.fill();
               }
+
+              // Draw the node
               ctx.fillStyle = color;
               ctx.beginPath();
               ctx.arc(x, y, radius, 0, 2 * Math.PI, false); // Use the adjusted radius
-              ctx.fill(); 
+              ctx.fill();
 
-              ctx.fillStyle = "#FFFFFF"
-              ctx.textAlign="center";
-              ctx.textBaseline="middle";
-              if(iteractionType == 1) {
-                ctx.font='6px Roboto';
-                ctx.fillText('ꓵ',x,y + 0.6);
-              } else if(iteractionType == 2) {
-                ctx.font='6px Roboto';
-                ctx.fillText('U',x,y + 0.8);
-              } else if (iteractionType == 3) {
-                ctx.font='12px Roboto';
-                ctx.fillText('-',x,y + 0.8);
-              }
-            }
+              // Draw the node ID inside the node
+              ctx.fillStyle = "#FFFFFF";
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.font = '6px Roboto'; // Increased font size
+              ctx.fillText(node.id + 1, x, y);
+      }
     ][0]();
   }
 
