@@ -355,10 +355,10 @@ export class ForceGraphComponent implements OnInit {
     console.log(node.imagesQuery)
     let str = `<b>Query num ${node.id + 1}:</b><br>`;
     if(queryType == 0) for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
-    else if(queryType == 1 || queryType == 4) for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images_USA/', 'https://storage.googleapis.com/trabalho_final/dataset/images_USA/')}"></img>`;
+    else if(queryType == 1 || queryType == 4) for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images_SIDEWALK/', 'https://storage.googleapis.com/trabalho_final/dataset/images_SIDEWALK/')}"></img>`;
     else {
       for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
-      for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images_USA/', 'https://storage.googleapis.com/trabalho_final/dataset/images_USA/')}"></img>`;
+      for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images_SIDEWALK/', 'https://storage.googleapis.com/trabalho_final/dataset/images_SIDEWALK/')}"></img>`;
     }
     return str
   }
