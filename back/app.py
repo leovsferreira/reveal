@@ -25,12 +25,12 @@ def search():
     # get parameters from request
     parameters = request.get_json()
     # reading datasets
-    images = pd.read_csv('multi_clip_images_sidewalk.csv', index_col="Unnamed: 0")
-    unique_texts = pd.read_csv('multi_clip_unique_texts_sidewalk.csv', index_col="Unnamed: 0")
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0")
+    unique_texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0")
     # load image embedding
-    image_embedding = torch.load('multi_clip_image_tensors_sidewalk.pt', map_location=current_app.torch_device)
+    image_embedding = torch.load('multi_clip_image_tensors.pt', map_location=current_app.torch_device)
     # load word embedding
-    word_embedding = torch.load('multi_clip_word_tensors_sidewalk.pt', map_location=current_app.torch_device)
+    word_embedding = torch.load('multi_clip_word_tensors.pt', map_location=current_app.torch_device)
 
     query_type = parameters['queryType']
     similarity_value = parameters['similarityValue'] / 100
@@ -113,8 +113,8 @@ def format_word_data(unique_texts, indices_wo, words_sim, indices_im, parameters
 @app.route('/api/state', methods=['POST'])
 def get_state():
     parameters = request.get_json()
-    images = pd.read_csv('multi_clip_images_sidewalk.csv', index_col="Unnamed: 0")
-    texts = pd.read_csv('multi_clip_unique_texts_sidewalk.csv', index_col="Unnamed: 0")
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0")
+    texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0")
     image_ids = parameters['imagesIds']
     text_ids = parameters['textsIds']
 
@@ -171,7 +171,7 @@ def aggregate_sets(image_ids, im_sim, text_ids, wo_sim, set_type):
 def get_info():
     parameters = request.get_json()
     image_path = parameters['string']
-    df = pd.read_csv("sidewalk_final_texts.csv")
+    df = pd.read_csv("usa_final_texts.csv")
     text = df.loc[df['image_paths'] == image_path, 'text'].item()
     return jsonify(text)
 

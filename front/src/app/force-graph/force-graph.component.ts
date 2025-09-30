@@ -4,7 +4,7 @@ import { ApiService } from 'src/app/shared/api.service';
 import { BuildSetQuery } from '../shared/api.models';
 import ForceGraph from 'force-graph';
 import * as d3 from "d3";
-import { thresholdFreedmanDiaconis } from 'd3';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf';
 
 @Component({
   selector: 'app-force-graph',
@@ -36,7 +36,9 @@ export class ForceGraphComponent implements OnInit {
   
   constructor(public global: GlobalService, public api: ApiService) { }
 
-  ngOnInit(): void {  }
+  async ngOnInit(): Promise<void> { 
+    GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(await import('pdfjs-dist/package.json')).version}/pdf.worker.min.js`;
+  }
 
   ngAfterViewInit(): void {
     this.setupForceGraph();
@@ -48,14 +50,15 @@ export class ForceGraphComponent implements OnInit {
 
     this.forceGraph = ForceGraph()(this.forceGraphDiv.nativeElement).graphData(this.forceGraphData)
     .autoPauseRedraw(false)
-    .dagMode('lr') // Left-to-right DAG layout
-    .dagLevelDistance(80)
-    .d3Force('collide', d3.forceCollide(50)) // Add collision force to avoid nodes being too close
+    .dagMode('lr')
+    .dagLevelDistance(100)
+    .d3Force('collide', d3.forceCollide(40))
     .nodeRelSize(5)
-    .linkDirectionalArrowLength(4)
-    .linkDirectionalArrowColor("#FF0080")
+    //.linkDirectionalArrowLength(4)
+    //.linkDirectionalArrowColor("#FFFFFF")
     .warmupTicks(300) 
     .cooldownTicks(0)
+    //.linkWidth(2)
     .onNodeClick((node, event) => {
       if (event.ctrlKey || event.shiftKey || event.altKey) { 
         // multi seleção
@@ -87,8 +90,49 @@ export class ForceGraphComponent implements OnInit {
     .nodeCanvasObject((node: any, ctx: any) => this.setNodeShape(node, this.setNodeColor(node), ctx, this.parentNode))
     .nodePointerAreaPaint((node: any, color: any, ctx: any) => this.setNodeShape(node, color, ctx, this.parentNode))
     .onNodeHover(node =>  { this.hoverNode = node || null })
-    .nodeLabel((node:any)  =>  this.buildTooltip(node, node.queryType))
-    .enableNodeDrag(false);
+    .enableNodeDrag(true)
+    .linkCanvasObjectMode(() => 'replace')
+    .linkCanvasObject((link, ctx) => {
+      const sourceNode = typeof link.source === 'object' ? link.source : this.forceGraph.graphData().nodes.find((n: any) => n.id === link.source);
+      const targetNode = typeof link.target === 'object' ? link.target : this.forceGraph.graphData().nodes.find((n: any) => n.id === link.target);
+
+      if (!sourceNode || !targetNode) return;
+
+      const radius = 6;
+      const renderScale = 3.0;
+      const displayScale = 0.08;
+      const pdfWidth = sourceNode.pdfImage ? sourceNode.pdfImage.width * displayScale : 0;
+      const pdfHeight = sourceNode.pdfImage ? sourceNode.pdfImage.height * displayScale : 0;
+      const offsetX = radius / 2 + pdfWidth;
+      const offsetY = radius / 2 + pdfHeight / 2;
+      const startX = sourceNode.x + offsetX;
+      const startY = sourceNode.y + offsetY;
+
+      const dx = targetNode.x - startX;
+      const dy = targetNode.y - startY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const arrowX = targetNode.x - (dx / distance) * radius;
+      const arrowY = targetNode.y - (dy / distance) * radius;
+
+      // Draw the link
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(arrowX, arrowY);
+      ctx.strokeStyle = '#95a5a6';
+      ctx.lineWidth = 0.2;
+      ctx.stroke();
+
+      const headlen = 6;
+      const angle = Math.atan2(dy, dx);
+      ctx.beginPath();
+      ctx.moveTo(arrowX, arrowY);
+      ctx.lineTo(arrowX - headlen * Math.cos(angle - Math.PI / 8), arrowY - headlen * Math.sin(angle - Math.PI / 8));
+      ctx.lineTo(arrowX - headlen * Math.cos(angle + Math.PI / 8), arrowY - headlen * Math.sin(angle + Math.PI / 8));
+      ctx.lineTo(arrowX, arrowY);
+      ctx.closePath();
+      ctx.fillStyle = '#95a5a6';
+      ctx.fill();
+    });
 
     this.setSize();
 
@@ -123,6 +167,7 @@ export class ForceGraphComponent implements OnInit {
     //se foi interação de interface, manter no mesmo ramo
     if(from == 'interface') {
       if (this.parentNode.size !== 0) {
+        //@ts-ignore
         this.forceGraphData.links.push({source: this.parentNode.values().next().value.id, target: nodeId})
       }
     }
@@ -351,17 +396,17 @@ export class ForceGraphComponent implements OnInit {
     this.forceGraph.height([height]);
   }
 
-  buildTooltip(node: any, queryType: number) {
-    console.log(node.imagesQuery)
-    let str = `<b>Query num ${node.id + 1}:</b><br>`;
-    if(queryType == 0) for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
-    else if(queryType == 1 || queryType == 4) for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images_SIDEWALK/', 'https://storage.googleapis.com/trabalho_final/dataset/images_SIDEWALK/')}"></img>`;
-    else {
-      for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
-      for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images_SIDEWALK/', 'https://storage.googleapis.com/trabalho_final/dataset/images_SIDEWALK/')}"></img>`;
-    }
-    return str
-  }
+  // buildTooltip(node: any, queryType: number) {
+  //   console.log(node.imagesQuery)
+  //   let str = `<b>Query num ${node.id + 1}:</b><br>`;
+  //   if(queryType == 0) for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
+  //   else if(queryType == 1 || queryType == 4) for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images_USA/', 'https://storage.googleapis.com/trabalho_final/dataset/images_USA/')}"></img>`;
+  //   else {
+  //     for(let i = 0; i < node.textsQuery.length; i++) str += `${node.textsQuery[i]}<br>`;
+  //     for(let i = 0; i < node.imagesQuery.length; i++) str += `<img style="max-width: 64px; max-height: 64px; margin-left: 12px" src="${node.imagesQuery[i].replace('dataset/images_USA/', 'https://storage.googleapis.com/trabalho_final/dataset/images_USA/')}"></img>`;
+  //   }
+  //   return str
+  // }
 
   setNodeColor(node: any) {
     if(this.selectedNodes.has(node)) {
@@ -383,50 +428,89 @@ export class ForceGraphComponent implements OnInit {
     const x = node.x;
     const y = node.y;
     const iteractionType = node.iteractionType;
-    const radius = this.selectedNodes.has(node) || node === this.hoverNode ? 8 : 6; // Adjust radius
+    const radius = this.selectedNodes.has(node) || node === this.hoverNode ? 8 : 6;
     [
       () => { 
-              // Draw the square with interaction type inside it, only if the node was originated by a set operation
+              const drawX = x + radius / 2;
+              const drawY = y + radius / 2;
+
               if (iteractionType !== 0) {
-                const width = 13; // Square width
-                const height = 13; // Square height
-                const offset = 2; // Offset to make the square touch the node
-                const roundedRadius = 2; // Radius for rounded corners
+                const width = 13;
+                const height = 13;
+                const roundedRadius = 2; 
 
-                const rectX = x + radius - offset;
-                const rectY = y + radius - offset;
-
-                // Draw the square with white background and thin black border with rounded corners
                 ctx.fillStyle = "#FFFFFF";
                 ctx.strokeStyle = "#000000";
-                ctx.lineWidth = 0.5; // Thinner border
+                ctx.lineWidth = 0.5;
                 ctx.beginPath();
-                ctx.moveTo(rectX + roundedRadius, rectY);
-                ctx.lineTo(rectX + width - roundedRadius, rectY);
-                ctx.arcTo(rectX + width, rectY, rectX + width, rectY + roundedRadius, roundedRadius);
-                ctx.lineTo(rectX + width, rectY + height - roundedRadius);
-                ctx.arcTo(rectX + width, rectY + height, rectX + width - roundedRadius, rectY + height, roundedRadius);
-                ctx.lineTo(rectX + roundedRadius, rectY + height);
-                ctx.arcTo(rectX, rectY + height, rectX, rectY + height - roundedRadius, roundedRadius);
-                ctx.lineTo(rectX, rectY + roundedRadius);
-                ctx.arcTo(rectX, rectY, rectX + roundedRadius, rectY, roundedRadius);
+                ctx.moveTo(drawX + roundedRadius, drawY);
+                ctx.lineTo(drawX + width - roundedRadius, drawY);
+                ctx.arcTo(drawX + width, drawY, drawX + width, drawY + roundedRadius, roundedRadius);
+                ctx.lineTo(drawX + width, drawY + height - roundedRadius);
+                ctx.arcTo(drawX + width, drawY + height, drawX + width - roundedRadius, drawY + height, roundedRadius);
+                ctx.lineTo(drawX + roundedRadius, drawY + height);
+                ctx.arcTo(drawX, drawY + height, drawX, drawY + height - roundedRadius, roundedRadius);
+                ctx.lineTo(drawX, drawY + roundedRadius);
+                ctx.arcTo(drawX, drawY, drawX + roundedRadius, drawY, roundedRadius);
                 ctx.fill();
                 ctx.stroke();
 
-                // Draw the interaction type symbol inside the square in black
                 ctx.fillStyle = 'black';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.font = '9px Roboto'; // Adjusted font size for interaction type
+                ctx.font = '9px Roboto';
                 if (iteractionType == 1) {
-                  ctx.fillText('ꓵ', rectX + width / 2, rectY + height / 2);
+                  ctx.fillText('ꓵ', drawX + width / 2, drawY + height / 2);
                 } else if (iteractionType == 2) {
-                  ctx.fillText('U', rectX + width / 2, rectY + height / 2);
+                  ctx.fillText('U', drawX + width / 2, drawY + height / 2);
                 } else if (iteractionType == 3) {
-                  ctx.fillText('-', rectX + width / 2, rectY + height / 2);
+                  ctx.fillText('-', drawX + width / 2, drawY + height / 2);
                 }
-              }
-              // Draw a red circle around the node if it is a parent
+              }// } else {
+              //   if (!node.pdfImage) {
+              //     const pdfNumber = node.id + 1;
+              //     const pdfUrl = `assets/${pdfNumber}.pdf`;
+
+              //     const loadingTask = getDocument(pdfUrl);
+              //     loadingTask.promise.then(pdf => {
+              //       pdf.getPage(1).then(page => {
+              //         const renderScale = 3.0; // Render at double resolution for better quality
+              //         const displayScale = 0.08; // Display at half size
+              //         const viewport = page.getViewport({ scale:  renderScale });
+
+              //         const canvas = document.createElement('canvas');
+              //         const context = canvas.getContext('2d');
+
+              //         if (context) {
+              //           canvas.height = viewport.height;
+              //           canvas.width = viewport.width;
+
+              //           const renderContext = {
+              //             canvasContext: context,
+              //             viewport
+              //           };
+
+              //           const renderTask = page.render(renderContext);
+              //           renderTask.promise.then(() => {
+              //             // Cache the rendered PDF as an image on the node object
+              //             node.pdfImage = new Image();
+              //             node.pdfImage.src = canvas.toDataURL();
+
+              //             // Draw the cached PDF image onto the graph canvas in the 4th quadrant
+              //             ctx.drawImage(node.pdfImage, drawX, drawY, canvas.width * displayScale, canvas.height * displayScale);
+              //           });
+              //         } else {
+              //           console.error('Failed to get canvas context');
+              //         }
+              //       });
+              //     }).catch(error => {
+              //       console.error(`Error rendering PDF ${pdfNumber}:`, error);
+              //     });
+              //   } else {
+              //     const displayScale = 0.08; // Display at half size
+              //     ctx.drawImage(node.pdfImage, drawX, drawY, node.pdfImage.width * displayScale, node.pdfImage.height * displayScale);
+              //   }
+              // }
               if (isParent) {
                 ctx.fillStyle = "#ff0000";
                 ctx.beginPath();

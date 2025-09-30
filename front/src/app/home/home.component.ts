@@ -46,7 +46,7 @@ export class HomeComponent implements AfterViewInit {
   public configVisibility = false;
   public inputDisabler = false;
   public draggable = true;
-  public similarityValue = 80;
+  public similarityValue = 70;
   public savedBuckets: any[] = [];
   public displayCombinedComponent: boolean = false;
   private rightClickCount: number = 1;
@@ -443,7 +443,7 @@ export class HomeComponent implements AfterViewInit {
     if(selectedImagesIds.length > 0) {
       for(let i = 0; i < selectedImagesIds.length; i++) {
         imageIndices.push(this.imageEmbedding.dataset.metadata[selectedImagesIds[i]].labelIndex);
-        imageLabels.push(`dataset/images_SIDEWALK/${this.imageEmbedding.dataset.labelPaths[selectedImagesIds[i]][0]}`);
+        imageLabels.push(`dataset/images_USA/${this.imageEmbedding.dataset.labelPaths[selectedImagesIds[i]][0]}`);
       };
     }
 

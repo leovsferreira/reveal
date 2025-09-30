@@ -14,7 +14,7 @@ export class SearchConfigComponent implements OnInit {
   @Output() clearEmbeddingsSelection = new EventEmitter();
   @Output() toggleCombinedEmbedding = new EventEmitter<boolean>();
 
-  public textInput = '80';
+  public textInput = '70';
   public searchSelectorDisabled: boolean = true;
   public linkInputDisabled: boolean = false;
 

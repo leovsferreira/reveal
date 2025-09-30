@@ -75,7 +75,7 @@ export class WordCloudComponent implements OnInit {
           this.selectedIndices.splice(index, 1);
         }
       } else {
-        D3.select(`#word-cloud-${id}`).style("fill", "#00FF00")
+        D3.select(`#word-cloud-${id}`).style("fill", "#107869")
         this.selectedIndices.push(id);
       }
       this.toggleText.emit({labels: this.selectedIndices, selected: true});
@@ -107,7 +107,7 @@ export class WordCloudComponent implements OnInit {
     .attr("id",  (d:any) => `word-cloud-${d.id}`)
     .on("click", (e: any, d: any) => this.onClick(e, d.id))
     .style('font-size', (d: any) => d.size + 'px')
-    .style("font-family", "Impact")
+    .style("font-family", "Roboto")
     .style('fill', (d: any, i: any) => "#7F7F7F")
     .attr('text-anchor', 'middle')
     .attr('transform', (d:any) => 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')')
@@ -122,7 +122,7 @@ export class WordCloudComponent implements OnInit {
       }
   
       for(let i = 0; i < points.length; i++) {
-        D3.select(`#word-cloud-${this.data[points[i]].id}`).style("fill", "#00FF00"); 
+        D3.select(`#word-cloud-${this.data[points[i]].id}`).style("fill", "#107869"); 
         this.selectedIndices.push(this.data[points[i]].id)
       }
     } else {
