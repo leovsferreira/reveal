@@ -8,6 +8,7 @@
 #gallery {
     width: 360px; /* Can be in percentage also. */
     margin: 0 auto;
+    margin-top: 10%;
 }
 
 .btn:focus {
@@ -41,4 +42,8 @@
 .btn:active {
     transform: translateY(2px);
     filter: saturate(150%);
+}
+
+::ng-deep .modal {
+    z-index: 99999;
 }

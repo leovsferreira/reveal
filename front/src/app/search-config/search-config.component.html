@@ -1,8 +1,59 @@
-<label for="customRange1" class="form-label">Similarity {{this.textInput}}</label>
-<input #similarityConfig (mousedown)="this.onDragBoxToggle()" (mouseup)="this.onDragBoxToggle()" type="range" value="80" class="form-range" min="70" max="100" step="1" id="customRange1" (change)="updateTextInput(similarityConfig.value)">
+<div class="settings-container">
+  <!-- Visualization Settings Section -->
+  <div class="settings-section">
+    <h5>Visualization Settings</h5>
+    <div class="input-group">
+      <mat-checkbox (change)="toggleCombinedDisplay($event)"></mat-checkbox>
+      <p class="input-label" style="margin-top: 15px; margin-left: 5px;">Joint embedding
+        <mat-icon class="aligned-icon custom-icon" matTooltip="Check this box to display the image and text embeddings as a single joint embedding. Uncheck to view them separately.">help</mat-icon>
+      </p>
+    </div>
+  </div>
 
-<br>
+  <!-- Divider -->
+  <hr class="divider">
 
+  <!-- Filter Settings Section -->
+  <div class="settings-section">
+    <h5>Filter Settings</h5>
+    <div class="input-group">
+      <p class="input-label">
+        Cosine similarity
+        <mat-icon class="aligned-icon custom-icon" matTooltip="Adjust the cosine similarity threshold to filter results based on their similarity. Higher values mean only more similar items will be included.">help</mat-icon>
+      </p>
+      <mat-slider class="custom-slider"
+        #similarityConfig
+        thumbLabel 
+        [displayWith]="formatLabel"
+        tickInterval="1"
+        (mousedown)="this.onDragBoxToggle()" 
+        (mouseup)="this.onDragBoxToggle()" 
+        id="customRange1"
+        min="70" 
+        max="100" 
+        step="1" 
+        value="80"
+        (change)="updateTextInput(similarityConfig.value)">
+      </mat-slider>
+    </div>
+
+    <div class="input-group">
+      <p class="input-label" style="margin-top: 20px;">
+        Date filter
+        <mat-icon class="aligned-icon custom-icon" matTooltip="Specify the date range to filter results within the selected period. Only items within the chosen start and end dates will be shown.">help</mat-icon>
+      </p>
+      <mat-form-field appearance="fill">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input [rangePicker]="picker">
+          <input matStartDate placeholder="Start date">
+          <input matEndDate placeholder="End date">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+    </div>
+  </div>
+</div>
 <!--
 <div class="form-check">
   <input class="form-check-input" type="radio" name="flexRadioControl" id="flexRadioControl1" value="link" checked [disabled]="this.linkInputDisabled" (change)="onLinkChange($event)">

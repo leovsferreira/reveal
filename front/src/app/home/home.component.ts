@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ViewChild, TemplateRef } from '@angular/core'
 
 import { ImageEmbeddingComponent } from 'src/app/image-embedding/image-embedding.component';
 import { TextEmbeddingComponent } from 'src/app/text-embedding/text-embedding.component';
+import { CombinedEmbeddingComponent } from '../combined-embedding/combined-embedding.component';
 import { ForceGraphComponent } from 'src/app/force-graph/force-graph.component';
 import { ImageGalleryComponent } from 'src/app/image-gallery/image-gallery.component';
 import { ColorLegendComponent } from '../color-legend/color-legend.component';
@@ -13,7 +14,7 @@ import { ModelGalleryComponent } from 'src/app/model-gallery/model-gallery.compo
 import { ApiService } from 'src/app/shared/api.service';
 import { AuthService } from '../shared/services/auth.service';
 import { GlobalService } from 'src/app/shared/global.service';
-import { Query, StateQuery } from '../shared/api.models';
+import { Query, StateQuery, InfoQuery } from '../shared/api.models';
 import { UntypedFormGroup, UntypedFormControl, Validators} from '@angular/forms';
 import { ContextMenu, MenuItemModel, ContextMenuModel, MenuEventArgs } from '@syncfusion/ej2-navigations';
 import { enableRipple } from '@syncfusion/ej2-base';
@@ -31,6 +32,7 @@ export class HomeComponent implements AfterViewInit {
   public Query: Query = new Query();
   public EmbeddingQuery: Query = new Query();
   public StateQuery: StateQuery = new StateQuery();
+  public InfoQuery: InfoQuery = new InfoQuery();
 
   public images: string[] = [];
   public texts: string[] = [];
@@ -44,14 +46,16 @@ export class HomeComponent implements AfterViewInit {
   public configVisibility = false;
   public inputDisabler = false;
   public draggable = true;
-  public similarityValue = 80;
+  public similarityValue = 70;
   public savedBuckets: any[] = [];
+  public displayCombinedComponent: boolean = false;
   private rightClickCount: number = 1;
   private ctxMenuSavedBuckets: any = [];
   private ctxMenuInUseBuckets: any = [];
 
   @ViewChild(ImageEmbeddingComponent, { static: true }) private imageEmbedding!:ImageEmbeddingComponent;
   @ViewChild(TextEmbeddingComponent, { static: true }) private textEmbedding!: TextEmbeddingComponent;
+  @ViewChild(CombinedEmbeddingComponent, { static: true }) private combinedEmbedding!: CombinedEmbeddingComponent;
   @ViewChild(ForceGraphComponent, { static: true }) private forceGraph!: ForceGraphComponent;
   @ViewChild(ImageGalleryComponent, { static: true }) private imageGallery!: ImageGalleryComponent;
   @ViewChild(ColorLegendComponent, {static: true}) private coloLegend!: ColorLegendComponent;
@@ -136,9 +140,14 @@ export class HomeComponent implements AfterViewInit {
         items: menuItemsInterfaceSearch,
         select: this.onInterfaceSearch.bind(this)
       };
+      let menuOptionsCombinedEmbedding: ContextMenuModel = {
+        target: '#combined-embedding-div',
+        items: menuItemsInterfaceSearch,
+        select: this.onInterfaceSearch.bind(this)
+      };
       const textEmbedding: ContextMenu = new ContextMenu(menuOptionsTextEmbedding, '#contextmenu-text-embedding')
       const ImageEmbedding: ContextMenu = new ContextMenu(menuOptionsImageEmbedding, '#contextmenu-image-embedding')
-      
+      const CombinedEmbedding: ContextMenu = new ContextMenu(menuOptionsCombinedEmbedding, '#contextmenu-combined-embedding')
       //inicializa menu para a galeria de imagens ou palavras
       let menuOptionsGalleries: ContextMenuModel = {
         target: '#gallery-div',
@@ -149,7 +158,7 @@ export class HomeComponent implements AfterViewInit {
       const Galleries: ContextMenu = new ContextMenu(menuOptionsGalleries, '#contextmenu-galleries')
 
       setTimeout(() => {  
-        this.setAllBucketsMenu();
+        this.setAllBucketsMenu("first load");
         this.setAllSavedStatesMenu();
         this.spinner.hide();
       },
@@ -157,7 +166,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   async search() {
-
+    
     this.Query.textsQuery = this.texts;
     this.Query.imagesQuery = this.images;
     this.Query.similarityValue = this.similarityValue;
@@ -189,10 +198,13 @@ export class HomeComponent implements AfterViewInit {
       this.forceGraph.addNode('searchbar');
       this.imageEmbedding.setupImageEmbedding(res.images);
       this.textEmbedding.setupTextEmbedding(res.texts);
+      this.combinedEmbedding.setupCombinedEmbedding(res.images, res.texts);
       this.imageGallery.updateImageGallery(res.images);
+      this.imageGallery.tabsCounter = 0;
       this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
       this.wordCloud.updateWordCloud(res.texts);
       this.spinner.hide();
+      console.log(res)
     } else {
       alert("Query empty")
     }
@@ -217,7 +229,9 @@ export class HomeComponent implements AfterViewInit {
       if(res.images.similarities.length > 0 && res.texts.similarities.length > 0) {
         this.imageEmbedding.setupImageEmbedding(res.images);
         this.textEmbedding.setupTextEmbedding(res.texts);
+        this.combinedEmbedding.setupCombinedEmbedding(res.images, res.texts);
         this.imageGallery.updateImageGallery(res.images);
+      this.imageGallery.tabsCounter = 0;
         this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
         this.wordCloud.updateWordCloud(res.texts);
       } else {
@@ -256,7 +270,9 @@ export class HomeComponent implements AfterViewInit {
     //starta os embeddings
     this.imageEmbedding.setupImageEmbedding(res.images);
     this.textEmbedding.setupTextEmbedding(res.texts);
+    this.combinedEmbedding.setupCombinedEmbedding(res.images, res.texts);
     this.imageGallery.updateImageGallery(res.images);
+      this.imageGallery.tabsCounter = 0;
     this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
     this.wordCloud.updateWordCloud(res.texts);
     this.spinner.hide();
@@ -330,15 +346,68 @@ export class HomeComponent implements AfterViewInit {
         this.textEmbedding.scatterGl.select([]);
         this.textEmbedding.highlightImages([]);
       }
-      
+
+      //clearing everything for the combined embedding
+      if(this.combinedEmbedding.scatterGl) {
+        this.highlightWordCloud([]);
+        this.combinedEmbedding.selectedPointsImages = [];
+        this.combinedEmbedding.selectedPointsTexts = [];
+        this.combinedEmbedding.highlightedIndicesImages = [];
+        this.combinedEmbedding.highlightedIndicesTexts = [];
+        this.combinedEmbedding.scatterGl.select([]);
+      }
+  }
+
+  highlightCombinedEmbeddingFromText(selectedPoints: any) {
+    const modifiedSelectedPoints = selectedPoints.map((value: number) => value + this.combinedEmbedding.cutIndex);
+    this.combinedEmbedding.wasCtrlKey = false;
+    this.combinedEmbedding.selectedPointsTexts = [];
+    this.combinedEmbedding.scatterGl.select([]);
+    this.combinedEmbedding.selectedPointsTexts = modifiedSelectedPoints;
+    this.combinedEmbedding.scatterGl.select(modifiedSelectedPoints);
+    this.combinedEmbedding.wasCtrlKey = true;
+
+    this.combinedEmbedding.colorPoints();
+  }
+
+  highlightCombinedEmbeddingFromImage(selectedPoints: any) {
+    this.combinedEmbedding.wasCtrlKey = false;
+    this.combinedEmbedding.selectedPointsImages = [];
+    this.combinedEmbedding.scatterGl.select([]);
+    this.combinedEmbedding.selectedPointsImages = selectedPoints;
+    this.combinedEmbedding.scatterGl.select(selectedPoints);
+    this.combinedEmbedding.wasCtrlKey = true;
+
+    this.combinedEmbedding.colorPoints();
+  }
+
+  toggleEmbeddingsFromCombined(obj: any) {
+    this.textEmbedding.wasCtrlKey = false;
+    this.textEmbedding.selectedPoints = [];
+    this.textEmbedding.scatterGl.select([]);
+    this.textEmbedding.selectedPoints = obj.selectedPointsTexts;
+    this.textEmbedding.scatterGl.select(obj.selectedPointsTexts);
+    this.textEmbedding.wasCtrlKey = true;
+
+    this.imageEmbedding.wasCtrlKey = false;
+    this.imageEmbedding.selectedPoints = [];
+    this.imageEmbedding.scatterGl.select([]);
+    this.imageEmbedding.selectedPoints = obj.selectedPointsImages;
+    this.imageEmbedding.scatterGl.select(obj.selectedPointsImages);
+    this.imageEmbedding.wasCtrlKey = true;
+    
+    this.textEmbedding.colorPoints();
+    this.imageEmbedding.colorPoints();
   }
 
   toggleEmbeddingImageFromGallery(obj: any) {
     this.imageEmbedding.toggleImages(obj);
+    this.combinedEmbedding.toggleImages(obj);
   }
 
   toggleEmbeddingTextFromCloud(obj: any) {
-    this.textEmbedding.toggleText(obj)
+    this.textEmbedding.toggleText(obj);
+    this.combinedEmbedding.toggleTexts(obj);
   }
 
   toggleConfigVisibility() {
@@ -362,6 +431,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   onInterfaceSearch(args: MenuEventArgs) {
+    console.log(args)
     const selectedImagesIds = this.imageEmbedding.selectedPoints;
     const selectedTextsIds = this.textEmbedding.selectedPoints;
 
@@ -373,7 +443,7 @@ export class HomeComponent implements AfterViewInit {
     if(selectedImagesIds.length > 0) {
       for(let i = 0; i < selectedImagesIds.length; i++) {
         imageIndices.push(this.imageEmbedding.dataset.metadata[selectedImagesIds[i]].labelIndex);
-        imageLabels.push(`dataset/images/${this.imageEmbedding.dataset.labelPaths[selectedImagesIds[i]][0]}`);
+        imageLabels.push(`dataset/images_USA/${this.imageEmbedding.dataset.labelPaths[selectedImagesIds[i]][0]}`);
       };
     }
 
@@ -433,7 +503,7 @@ export class HomeComponent implements AfterViewInit {
     } else if(args.item.id == 'delete') {
       this.bucket.destroyBucket(this.bucket.lastRightClick);
     } else {
-      const bucketImages = this.bucket.getImages(this.bucket.lastRightClick);
+      const bucketImages = this.bucket.getImages(this.bucket.lastRightClick,'inuse');
       this.modalGallery.openModal(bucketImages);
     }
   }
@@ -444,8 +514,12 @@ export class HomeComponent implements AfterViewInit {
     } else if(args.item.id == 'open') {
       this.bucket.openUserBucket(this.bucket.lastRightClick);
     } else {
-      const bucketImages = this.bucket.getImages(this.bucket.lastRightClick);
-      this.modalGallery.openModal(bucketImages);
+      if(!this.modalGallery.isModalOpen) {
+        const bucketImages = this.bucket.getImages(this.bucket.lastRightClick, 'saved');
+        this.modalGallery.openModal(bucketImages);        
+      } else {
+        console.log('modal already open')
+      }
     }
   }
 
@@ -527,10 +601,13 @@ export class HomeComponent implements AfterViewInit {
   }
 
 
-  setAllBucketsMenu() {
-    for(let i = 0; i < this.bucket.bucketsInUse.length;  i++) {
-      this.setBucketsMenu(this.bucket.bucketsInUse[i].id);
+  setAllBucketsMenu(from: string) {
+    if(from !== 'saving') {
+      for(let i = 0; i < this.bucket.bucketsInUse.length;  i++) {
+        this.setBucketsMenu(this.bucket.bucketsInUse[i].id);
+      }
     }
+
     for(let i = 0; i < this.bucket.savedBuckets.length;  i++) {
       this.setSavedBucketsMenu(this.bucket.savedBuckets[i].id)
     }
@@ -562,6 +639,7 @@ export class HomeComponent implements AfterViewInit {
   resetAll(from: string = 'node') {
     this.imageEmbedding.clear();
     this.textEmbedding.clear();
+    this.combinedEmbedding.clear();
     this.coloLegend.clear();
     this.imageGallery.clear();
     this.wordCloud.clear();
@@ -577,6 +655,8 @@ export class HomeComponent implements AfterViewInit {
   }
 
   addImageToBucket(event: any) {
+    console.log(event)
+    console.log(this.imageGallery.selectedIndices)
     if(this.bucket.bucketToDrop !== -1) {
       if(this.imageGallery.selectedIndices.length > 0) {
         for(let i = 0; i < this.imageGallery.selectedImagePaths.length; i++) {
@@ -587,5 +667,15 @@ export class HomeComponent implements AfterViewInit {
       }
     }
     this.bucket.bucketToDrop = -1; 
+  }
+
+  async infoQuery (event: string) {
+    this.InfoQuery['string'] = event;
+    const res = await this.api.getInfo(this.InfoQuery);
+    this.imageGallery.info = res;
+  }
+
+  onEmbeddingToggle(event: any) {
+    this.displayCombinedComponent = event;
   }
 }

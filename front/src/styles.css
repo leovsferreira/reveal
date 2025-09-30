@@ -10,6 +10,8 @@
 @import '~lightgallery/css/lg-thumbnail.css';
 @import 'tippy.js/dist/tippy.css';
 @import 'tippy.js/themes/translucent.css';
+@import '../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons");
 /* You can add global styles to this file, and also import other style files */
 .fill {
     position: relative;
@@ -17,3 +19,12 @@
     height: 100%;
 }
 
+
+.tippy-box.transparent-background {
+    background-color: transparent !important;
+    box-shadow: none !important; 
+}
+
+.tippy-box.transparent-background .tippy-content {
+    padding: 0 !important; 
+}

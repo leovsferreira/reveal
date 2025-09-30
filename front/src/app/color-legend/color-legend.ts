@@ -8,7 +8,7 @@ export class ColorLegend {
     protected width: number = 0;
     protected height: number = 0;
     protected cScale: any = null;
-    protected margin: any = {right: 20, left:20, top: 0, bottom: 0}
+    protected margin: any = {right: 20, left:20, top: 20, bottom: 20}
 
     constructor(legendDiv: HTMLElement) {
         this.legendDiv = legendDiv;
@@ -18,14 +18,14 @@ export class ColorLegend {
     }
 
     initSvg() {
-    // dimensions using margins convention
-    this.width = this.legendDiv.clientWidth;
-    this.height = this.legendDiv.clientHeight;
-    // creates the new canvas element
-    this.svgCanvas = d3.select(this.legendDiv)
-        .append('svg')
-        .attr('width', this.legendDiv.clientWidth + 30)
-        .attr('height', this.legendDiv.clientHeight);        
+        // dimensions using margins convention
+        this.width = this.legendDiv.clientWidth;
+        this.height = this.legendDiv.clientHeight;
+        // creates the new canvas element
+        this.svgCanvas = d3.select(this.legendDiv)
+            .append('svg')
+            .attr('width', this.legendDiv.clientWidth)
+            .attr('height', this.legendDiv.clientHeight + 30);  
     }
 
     initScales() {
@@ -37,33 +37,39 @@ export class ColorLegend {
         const defs = this.svgCanvas.append('defs')
         const linearGradient = defs.append('linearGradient')
                                 .attr('id', 'linear-gradient')
+                                .attr('x1', '0%')
+                                .attr('y1', '100%')
+                                .attr('x2', '0%')
+                                .attr('y2', '0%');
 
         linearGradient.selectAll('stop')
             .data(this.cScale.ticks().map((t: any, i: any, n: any) => ({ offset: `${100*i/n.length}%`, color: this.cScale(t) })))
             .enter().append('stop')
             .attr('offset', (d: any) => d.offset)
             .attr('stop-color', (d: any) => d.color); 
+
         this.svgCanvas        
             .append('g')
             .attr('id', 'legend')
-            .attr("transform", "translate(" + (this.width*0.05) + " ," + 0 + ")")
+            .attr("transform", "translate(" + 0 + " ," + (-12) + ")")
             .append("rect")
-            .attr('transform', "translate(" + this.margin.left + " ," +  0 + ")")
-            .attr("width", this.width - this.margin.right - this.margin.left)
-            .attr("height", 12)
+            .attr('transform', "translate(" + 0 + " ," + this.margin.top + ")")
+            .attr("width", 12)
+            .attr("height", this.height - this.margin.top - this.margin.bottom)
             .style('fill', 'url(#linear-gradient)')
                     
-        const legendScale = d3.scaleLinear()
-                            .domain([min, max])
-                            .range([this.margin.left, this.width - this.margin.right])
+            const legendScale = d3.scaleLinear()
+                                .domain([min, max])
+                                .range([this.height - this.margin.bottom, this.margin.top]);
         
         this.svgCanvas
             .append('g')
             .attr("class", "legend-scale")
-            .attr("transform", "translate(" + (this.width*0.05) + " ," + 0 + ")")
-            .call(d3.axisBottom(legendScale)
+            .attr("transform", "translate(" + 0 + " ," + (-12) + ")")
+            .call(d3.axisRight(legendScale)
             .ticks(4)
-            .tickSize(12))
+            .tickSize(12)
+            .tickFormat((d:any) => (d * 100).toFixed(0)))
     
         this.svgCanvas.selectAll(".legend-scale line")
             .attr("stroke", "#fff");

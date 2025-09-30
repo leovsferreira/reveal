@@ -45,7 +45,7 @@ export class BucketComponent implements OnInit {
       this.userBuckets = data;
       this.displaySavedBucket();
       setTimeout(() => {  
-        this.bucketSaved.emit(bucketId); 
+        this.bucketSaved.emit("saving"); 
         this.spinner.hide();
       },
       1000);
@@ -53,17 +53,20 @@ export class BucketComponent implements OnInit {
   }
 
   destroyBucket(bucketId: number) {
-    this.spinner.show();
-    const query = this.bucketService.destroyUserBucket(bucketId);
-    query.then((data:any) => {
-      this.userBuckets = data;
-      this.destroySavedBucket(bucketId);
-      this.closeInUseBuckets(bucketId);
-      setTimeout(() => {  
-        this.spinner.hide();
-      },
-      1000);
-    });
+    let bool = confirm("Deseja excluir este bucket?");
+    if(bool) {
+      this.spinner.show();
+      const query = this.bucketService.destroyUserBucket(bucketId);
+      query.then((data:any) => {
+        this.userBuckets = data;
+        this.destroySavedBucket(bucketId);
+        this.closeInUseBuckets(bucketId);
+        setTimeout(() => {  
+          this.spinner.hide();
+        },
+        1000);
+      });
+    }
   }
 
   closeBucket(bucketId: number) {
@@ -190,15 +193,18 @@ export class BucketComponent implements OnInit {
     }
   }
 
-  getImages(bucketId: number) {
-    for(let i = 0; i < this.savedBuckets.length; i++) {
-      if(bucketId == this.savedBuckets[i].id) {
-        return this.savedBuckets[i].imageUrls;
+  getImages(bucketId: number, from: string) {
+    if(from == "saved") {
+      for(let i = 0; i < this.savedBuckets.length; i++) {
+        if(bucketId == this.savedBuckets[i].id) {
+          return this.savedBuckets[i].imageUrls;
+        }
       }
-    }
-    for(let i = 0; i < this.bucketsInUse.length; i++) {
-      if(bucketId == this.bucketsInUse[i].id) {
-        return this.bucketsInUse[i].imageUrls;
+    } else {
+      for(let i = 0; i < this.bucketsInUse.length; i++) {
+        if(bucketId == this.bucketsInUse[i].id) {
+          return this.bucketsInUse[i].imageUrls;
+        }
       }
     }
   }

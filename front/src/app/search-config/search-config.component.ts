@@ -12,8 +12,9 @@ export class SearchConfigComponent implements OnInit {
   @Output() dragBoxToggled = new EventEmitter<number>();
   @Output() similarityChanged = new EventEmitter<number>();
   @Output() clearEmbeddingsSelection = new EventEmitter();
+  @Output() toggleCombinedEmbedding = new EventEmitter<boolean>();
 
-  public textInput = '80';
+  public textInput = '70';
   public searchSelectorDisabled: boolean = true;
   public linkInputDisabled: boolean = false;
 
@@ -21,9 +22,8 @@ export class SearchConfigComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  updateTextInput(value: string) {
-    this.textInput = value;
-    this.similarityChanged.emit(parseInt(value));
+  updateTextInput(value: number) {
+    this.similarityChanged.emit(value);
   }
 
   onDragBoxToggle() {
@@ -49,5 +49,13 @@ export class SearchConfigComponent implements OnInit {
     else this.linkInputDisabled = true;
     
     this.clearEmbeddingsSelection.emit();
+  }
+
+  toggleCombinedDisplay(event: any) {
+    this.toggleCombinedEmbedding.emit(event.checked);
+  }
+
+  formatLabel(value: number) {
+    return value;
   }
 }

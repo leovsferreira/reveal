@@ -10,7 +10,7 @@ from flask import current_app
 
 # declare constants
 HOST = '0.0.0.0'
-PORT = 8081
+PORT = 8001
 # initialize flask application
 app = Flask(__name__)
 app.image_encoder, app.image_preprocess = build_image_encoder()
@@ -19,223 +19,161 @@ app.text_tokenizer = build_text_tokenizer()
 app.torch_device = get_torch_device()
 
 CORS(app)
+
 @app.route('/api/search', methods=['POST'])
 def search():
     # get parameters from request
     parameters = request.get_json()
     # reading datasets
-    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
-    unique_texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0")
+    unique_texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0")
     # load image embedding
-    image_embedding = torch.load('multi_clip_image_tensors.pt', map_location=torch.device('cpu'))
+    image_embedding = torch.load('multi_clip_image_tensors.pt', map_location=current_app.torch_device)
     # load word embedding
-    word_embedding = torch.load('multi_clip_word_tensors.pt', map_location=torch.device('cpu'))
+    word_embedding = torch.load('multi_clip_word_tensors.pt', map_location=current_app.torch_device)
 
     query_type = parameters['queryType']
     similarity_value = parameters['similarityValue'] / 100
-    #constroi os tensores baseado nos dados provenientes da query
-    tensors = []
-    if query_type == 2:
-        texts_tensors, images_tensors = build_tensors(parameters,
-                                                      query_type, 
-                                                      current_app.torch_device, 
-                                                      current_app.image_encoder,
-                                                      current_app.image_preprocess,  
-                                                      current_app.text_encoder,
-                                                      current_app.text_tokenizer)
-        tensors = [texts_tensors, images_tensors]
-    else:
-        tensors = build_tensors(parameters,
-                                query_type, 
-                                current_app.torch_device, 
-                                current_app.image_encoder,
-                                current_app.image_preprocess,  
-                                current_app.text_encoder,
-                                current_app.text_tokenizer)
-    #calcula similaridades individualmente para imagens e para textos
-    similarities = calculate_similarities(tensors, image_embedding, word_embedding, query_type)
-    #normaliza a similaridade dos textos caso tenha texto na query
-    similarities_im = []
-    similarities_wo = []
-    for i in range(len(similarities)):
-        similarities[i] = normalize_similarities(similarities[i])
+    
+    tensors = build_tensors(parameters, query_type, current_app.torch_device, current_app.image_encoder, current_app.image_preprocess, current_app.text_encoder, current_app.text_tokenizer)
+    
+    # Calculate similarities
+    similarities = calculate_similarities(tensors, image_embedding, word_embedding, query_type, current_app.torch_device)
+    # Normalize similarities
+    similarities = [normalize_similarities(sim) for sim in similarities]
+    
+    similarities_im, similarities_wo = [], []
     if query_type == 2:
         similarities_im = [similarities[0], similarities[1]]
         similarities_wo = [similarities[2], similarities[3]]
     else:
         similarities_im = [similarities[0]]
         similarities_wo = [similarities[1]]
-    #if intersection is selected
-    """
-    if 'dataHistory' in parameters:
-        print("entrou na interseção")
-        indices = []
-        indices = get_indices_and_values(image_embedding, query, query_type, similarity_value)
-        data_history = parameters['dataHistory']
-        for i in range(len(data_history)):
-            query_type = data_history[i]["queryType"]
-            similarity_value = data_history[i]["similarityValue"]
-            query = choose_query_based_on_origin(data_history[i], query_type, images)
-            indices = set(indices).intersection(get_indices_and_values(image_embedding, query, query_type, similarity_value))
-            indices = list(indices)
-            
-    else:
-        
-
-    """
+    
     indices_im, images_sim = get_indices(similarities_im, similarity_value)
     indices_wo, words_sim = get_indices(similarities_wo, similarity_value)
-
+    
     indices_im = [int(i) for i in indices_im]
-    images_sim = list(np.around(np.array(images_sim),4))
+    images_sim = list(np.around(np.array(images_sim), 4))
     indices_wo = [int(i) for i in indices_wo]
-    words_sim = list(np.around(np.array(words_sim),4))
-    # if query is a text query will return results based on the query string
-    # if query is an image query will return results based on the query image
-    # selecting images to return
+    words_sim = list(np.around(np.array(words_sim), 4))
+    
+    # Selecting images and texts based on indices
     images = images.iloc[indices_im, :]
-
-
-    # select texts based on image index
     unique_texts = unique_texts.iloc[indices_wo, :]
+    
     images['sim'] = images_sim
     images = images.sort_values(by=['sim'], ascending=False)
     unique_texts['sim'] = words_sim
     unique_texts = unique_texts.sort_values(by=['sim'], ascending=False)
+    
+    image_data = format_image_data(images, indices_im, images_sim, parameters)
+    word_data = format_word_data(unique_texts, indices_wo, words_sim, indices_im, parameters)
+    
+    return jsonify({'texts': word_data, 'images': image_data})
 
-    # building images and word data
+def format_image_data(images, indices_im, images_sim, parameters):
     image_index = images.index.tolist()
     images = images.to_numpy()
-    image_coords = images[:, [2,3]].tolist()
+    image_coords = images[:, [2, 3]].tolist()
     image_path = images[:, [0]].tolist()
-    images_sim = list(chain.from_iterable(images[:, [4]].tolist()))
-    text_ids = []
+    text_ids = [
+                list(map(int, img[1].split(','))) if isinstance(img[1], str) and img[1] else [-1]
+                for img in images
+            ]
 
-    for i in range(len(images)):
-        try:
-            text_string_list = images[i][1].split(',')
-        except:
-            text_string_list = [-1]
-        text_int_list = [int(x) for x in text_string_list]
-        text_ids.append(text_int_list)
-        
-    image_data = {"similarities": images_sim, "labels":image_index,"projection": image_coords,"labelPaths":image_path, "numberOfImages": len(image_index),"textIds": text_ids, "similarityValue": parameters['similarityValue'] / 100 }
-    
+    return {
+        "similarities": images_sim,
+        "labels": image_index,
+        "projection": image_coords,
+        "labelPaths": image_path,
+        "numberOfImages": len(image_index),
+        "textIds": text_ids,
+        "similarityValue": parameters['similarityValue'] / 100
+    }
+
+def format_word_data(unique_texts, indices_wo, words_sim, indices_im, parameters):
     word_index = unique_texts.index.tolist()
     unique_texts = unique_texts.to_numpy()
-
-    word_coords = unique_texts[:, [2,3]].tolist()
+    word_coords = unique_texts[:, [2, 3]].tolist()
     word_labels = unique_texts[:, [0]].tolist()
-    words_sim = list(chain.from_iterable(unique_texts[:, [4]].tolist()))
-    image_ids = []
+    image_ids = [list(map(int, txt[1].split(','))) if txt[1] else [-1] for txt in unique_texts]
 
-    for i in range(len(unique_texts)):
-        try:
-            image_string_list = unique_texts[i][1].split(',')
-        except:
-            image_string_list = [-1]
-        image_int_list = [int(x) for x in image_string_list]
-        image_ids.append(image_int_list)
-    word_data = {"similarities": words_sim,"labels": word_index,"labelNames":word_labels, "numberOfTexts": len(word_index),"projection":word_coords, "imageIds": image_ids, "imageIndices": image_index, "similarityValue": parameters['similarityValue'] / 100 }
+    return {
+        "similarities": words_sim,
+        "labels": word_index,
+        "labelNames": word_labels,
+        "numberOfTexts": len(word_index),
+        "projection": word_coords,
+        "imageIds": image_ids,
+        "imageIndices": indices_im,
+        "similarityValue": parameters['similarityValue'] / 100
+    }
 
-    return jsonify({'texts': word_data, 'images':image_data})
-
-#state
 @app.route('/api/state', methods=['POST'])
 def get_state():
     parameters = request.get_json()
-    # reading datasets
-    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0", engine='python')
-    texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0", engine='python')
+    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0")
+    texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0")
     image_ids = parameters['imagesIds']
     text_ids = parameters['textsIds']
-    if len(np.shape(parameters["imagesSimilarities"])) > 1:
-        im_sim = list(chain.from_iterable(parameters["imagesSimilarities"]))
-    else:
-        im_sim = parameters["imagesSimilarities"]
-    if len(np.shape(parameters["textsSimilarities"])) > 1:
-        wo_sim = list(chain.from_iterable(parameters["textsSimilarities"]))
-    else:
-        wo_sim = parameters["textsSimilarities"]
 
+    im_sim = flatten_list(parameters["imagesSimilarities"])
+    wo_sim = flatten_list(parameters["textsSimilarities"])
+    
     images = images.iloc[image_ids, :]
     texts = texts.iloc[text_ids, :]
-    # building images and word data
-    image_index = images.index.tolist()
-    images = images.to_numpy()
-    image_coords = images[:, [2,3]].tolist()
-    image_path = images[:, [0]].tolist()
-    text_ids = []
-
-    for i in range(len(images)):
-        try:
-            text_string_list = images[i][3].split(',')
-        except:
-            text_string_list = ["-1"]
-        text_int_list = [int(x) for x in text_string_list]
-        text_ids.append(text_int_list)
-
-    image_data = {"similarities": im_sim, "labels":image_index,"projection": image_coords,"labelPaths":image_path, "numberOfImages": len(image_index), "textIds": text_ids, "similarityValue": parameters['similarityValue']/100 }
     
-    word_index = texts.index.tolist()
-    unique_texts = texts.to_numpy()
-    word_coords = unique_texts[:, [2,3]].tolist()
-    word_labels = unique_texts[:, [0]].tolist()
-    image_ids = []
+    image_data = format_image_data(images, image_ids, im_sim, parameters)
+    word_data = format_word_data(texts, text_ids, wo_sim, image_ids, parameters)
+    
+    return jsonify({'texts': word_data, 'images': image_data})
 
-    for i in range(len(unique_texts)):
-        try:
-            image_string_list = unique_texts[i][3].split(',')
-        except:
-            image_string_list = ["-1"]
-        image_int_list = [int(x) for x in image_string_list]
-        image_ids.append(image_int_list)
+def flatten_list(nested_list):
+    return list(chain.from_iterable(nested_list)) if len(np.shape(nested_list)) > 1 else nested_list
 
-    word_data = {"similarities": wo_sim,"labels": word_index ,"labelNames":word_labels, "numberOfTexts": len(word_index),"projection":word_coords, "imageIds": image_ids, "imageIndices": image_index, "similarityValue": parameters['similarityValue'] / 100 }
-    return jsonify({'texts': word_data, 'images':image_data})
-
-#build new set
 @app.route('/api/build_set', methods=['POST'])
 def build_new_set():
     parameters = request.get_json()
-    # reading datasets
     image_ids = parameters['imagesIds']
     text_ids = parameters['textsIds']
-    try:
-        im_sim = list(chain.from_iterable(parameters["imagesSimilarities"]))
-    except:
-        im_sim = parameters["imagesSimilarities"]
-    try:
-        wo_sim = list(chain.from_iterable(parameters["textsSimilarities"]))
-    except: 
-        wo_sim = parameters["textsSimilarities"]
+
+    im_sim = flatten_list(parameters["imagesSimilarities"])
+    wo_sim = flatten_list(parameters["textsSimilarities"])
+    
     set_type = parameters["setType"]
+    unique_images, unique_texts = aggregate_sets(image_ids, im_sim, text_ids, wo_sim, set_type)
+    
+    image_data = {"similarities": unique_images['sim'].tolist(), "labels": unique_images['id'].tolist()}
+    word_data = {"similarities": unique_texts['sim'].tolist(), "labels": unique_texts['id'].tolist()}
+    
+    return jsonify({'texts': word_data, 'images': image_data})
+
+def aggregate_sets(image_ids, im_sim, text_ids, wo_sim, set_type):
     non_unique_images = pd.DataFrame({'id': image_ids, 'sim': im_sim})
     non_unique_texts = pd.DataFrame({'id': text_ids, 'sim': wo_sim})
+    
     if set_type == 'union':
-        # transforma repetidos em unicos para imagens e textos
         unique_images = non_unique_images.groupby('id', as_index=False).mean()
         unique_texts = non_unique_texts.groupby('id', as_index=False).mean()
-    if set_type == 'intersection':
+    elif set_type == 'intersection':
         mask_images = non_unique_images.id.duplicated(keep=False)
         mask_texts = non_unique_texts.id.duplicated(keep=False)
         unique_images = non_unique_images[mask_images].groupby('id', as_index=False).mean()
         unique_texts = non_unique_texts[mask_texts].groupby('id', as_index=False).mean()
-    if set_type == 'difference':
-        unique_images = pd.DataFrame({'id': image_ids, 'sim': im_sim})
-        unique_texts = pd.DataFrame({'id': text_ids, 'sim': wo_sim})
-    #cria vetores de unicos
-    im_sim = unique_images['sim'].tolist()
-    image_ids = unique_images['id'].tolist()
-    wo_sim = unique_texts['sim'].tolist()
-    text_ids = unique_texts['id'].tolist()
+    else:  # set_type == 'difference'
+        unique_images = non_unique_images
+        unique_texts = non_unique_texts
+    
+    return unique_images, unique_texts
 
-    image_data = {"similarities": im_sim, "labels":image_ids}
-    word_data = {"similarities": wo_sim,"labels": text_ids}
-    return jsonify({'texts': word_data, 'images':image_data})
+@app.route('/api/info', methods=['POST'])
+def get_info():
+    parameters = request.get_json()
+    image_path = parameters['string']
+    df = pd.read_csv("usa_final_texts.csv")
+    text = df.loc[df['image_paths'] == image_path, 'text'].item()
+    return jsonify(text)
 
 if __name__ == '__main__':
-    # run web server
-    app.run(host=HOST,
-            debug=True,  # automatic reloading enabled
-            port=PORT)
+    app.run(host=HOST, debug=True, port=PORT)

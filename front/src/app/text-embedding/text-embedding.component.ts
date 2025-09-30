@@ -1,6 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { GlobalService } from 'src/app/shared/global.service';
-import * as THREE from 'three';
 import * as ScatterGL from 'scatter-gl';
 import * as d3 from 'd3';
 
@@ -15,6 +14,7 @@ export class TextEmbeddingComponent implements OnInit {
   @Output() textLinkSelected = new EventEmitter<any>();
   @Output() clearEmbeddingsSelection = new EventEmitter();
   @Output() highlightWordCloud = new EventEmitter();
+  @Output() highlightCombinedEmbedding = new EventEmitter<any>();
   
   private textEmbedding: any;
   private colorScale: any = d3.scaleSequential(d3.interpolateReds);
@@ -22,7 +22,7 @@ export class TextEmbeddingComponent implements OnInit {
   public dataset: any;
   public wichModeSelected: string = "pan";
   public selectedPoints: any = [];
-  private wasCtrlKey: boolean = false;
+  public wasCtrlKey: boolean = false;
   public highlitedIndices: any = [];
   constructor(public global: GlobalService) { }
 
@@ -50,18 +50,20 @@ export class TextEmbeddingComponent implements OnInit {
             this.highlightImages(this.selectedPoints);
             this.scatterGl.select(this.selectedPoints)
             this.highlightWordCloud.emit(this.selectedPoints);
+            this.highlightCombinedEmbedding.emit(this.selectedPoints);
           } else {
             if(points.length == 0) {
               this.wasCtrlKey = false;
               this.clearEmbeddingsSelection.emit();
               this.highlightWordCloud.emit([])
+              this.highlightCombinedEmbedding.emit([]);
             };
           }
           this.colorPoints();
         },
         renderMode: ScatterGL.RenderMode.POINT,
         orbitControls: {
-          zoomSpeed: 1.125,
+          zoomSpeed: 3,
         },
       });
 

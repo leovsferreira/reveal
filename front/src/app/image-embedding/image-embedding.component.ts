@@ -17,6 +17,7 @@ export class ImageEmbeddingComponent implements OnInit {
   @Output() imageLinkSelected = new EventEmitter<any>();
   @Output() clearEmbeddingsSelection = new EventEmitter<string>();
   @Output() highlightImageGallery = new EventEmitter<any>();
+  @Output() highlightCombinedEmbedding = new EventEmitter<any>();
 
   private imageEmbedding: any;
   public selectedPoints: any = [];
@@ -27,7 +28,7 @@ export class ImageEmbeddingComponent implements OnInit {
   public scatterGl: any = null;
   public dataset: any;
   public wichModeSelected: string = "pan";
-  private wasCtrlKey: boolean = false;
+  public wasCtrlKey: boolean = false;
   public highlitedIndices: any = [];
   constructor(public global: GlobalService) { }
 
@@ -59,11 +60,13 @@ export class ImageEmbeddingComponent implements OnInit {
             this.highlightTexts(this.selectedPoints);
             this.scatterGl.select(this.selectedPoints);
             this.highlightImageGallery.emit(this.selectedPoints);
+            this.highlightCombinedEmbedding.emit(this.selectedPoints);
           } else {
             if(points.length == 0) {
               this.wasCtrlKey = false;
               this.clearEmbeddingsSelection.emit();
-              this.highlightImageGallery.emit([])
+              this.highlightImageGallery.emit([]);
+              this.highlightCombinedEmbedding.emit([]);
             };
           }
           this.colorPoints();
@@ -75,10 +78,15 @@ export class ImageEmbeddingComponent implements OnInit {
             const clientY = this.clientY;
             const imagePath = this.dataset.labelPaths[point][0];
             this.tooltip = tippy(this.imageEmbeddingDiv.nativeElement, {
-              theme: 'translucent'
+              theme: 'translucent',
+              arrow: false,
+              onShow(instance: any) {
+                instance.popper.querySelector('.tippy-box').classList.add('transparent-background');
+              }
             });
+            
             this.tooltip.setProps({
-              content: `<img style="max-width: 128px; max-height: 128px;" src="https://storage.googleapis.com/pm2023/images/${imagePath}"></img>`,
+              content: `<img style="max-width: 128px; max-height: 128px;" src="https://storage.googleapis.com/trabalho_final/dataset/images_USA/${imagePath}"></img>`,
               allowHTML: true,
               getReferenceClientRect: () => ({
                 width: 0,
@@ -96,7 +104,7 @@ export class ImageEmbeddingComponent implements OnInit {
         renderMode: ScatterGL.RenderMode.POINT,
         showLabelsOnHover: false,
         orbitControls: {
-          zoomSpeed: 1.125,
+          zoomSpeed: 3,
         },
       });
 
@@ -116,6 +124,7 @@ export class ImageEmbeddingComponent implements OnInit {
         label
       });
     }
+
     this.dataset = new ScatterGL.Dataset(dataPoints, metadata);
     this.dataset["labelPaths"] = data.labelPaths;
     this.dataset["textIds"] = data.textIds;
@@ -172,6 +181,7 @@ export class ImageEmbeddingComponent implements OnInit {
   }
 
   colorPoints() {
+    console.log(this.selectedPoints)
     const data = this.dataset['similarities'];
     // @ts-ignore
     this.colorScale.domain( [this.dataset["similarityValue"], Math.max( ...data )] );

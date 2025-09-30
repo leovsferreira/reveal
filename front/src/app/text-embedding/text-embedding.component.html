@@ -1,11 +1,14 @@
-<div class="mode-control">
-    <button class="btn btn-custom" type="button" [style.background-color]="this.wichModeSelected == 'pan' ? '#eee' : '#fff' " (click)="this.setMode('pan')">
+<div class="mode-control" style="left: 36%;">
+    <button class="btn btn-custom" type="button" [style.background-color]="this.wichModeSelected == 'pan' ? '#eee' : '#fff' " (click)="this.setMode('pan')"
+        matTooltip="Select individual points in the text embedding to analyze specific data points in detail.">
         <span class="fa-solid fa-arrow-pointer"
-        [style.color]="this.wichModeSelected == 'pan' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+        [style.color]="this.wichModeSelected == 'pan' ? '#97a97c' : 'rgba(149, 165, 166, 1)' "></span>
     </button>
-    <button class="btn btn-custom" type="button" [style.background-color]="this.wichModeSelected == 'area' ? '#eee' : '#fff' " (click)="this.setMode('area')">
+    <button class="btn btn-custom" type="button" [style.background-color]="this.wichModeSelected == 'area' ? '#eee' : '#fff' " (click)="this.setMode('area')"
+        matTooltip="Select a group of points in the text embedding by defining an area to analyze multiple data points simultaneously.">
         <span class="fa-solid fa-vector-square"
-        [style.color]="this.wichModeSelected == 'area' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+        [style.color]="this.wichModeSelected == 'area' ? '#97a97c' : 'rgba(149, 165, 166, 1)' "></span>
     </button>
 </div>
+<mat-icon matTooltip="The text embedding arranges the query results in a 2D space as points, positioning texts with similar characteristics close to each other." class="help-icon">help</mat-icon>
 <div class="fill" #textEmbedding></div>

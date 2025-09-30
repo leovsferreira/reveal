@@ -68,17 +68,20 @@ export class StateComponent implements OnInit {
   }
 
   destroyState(stateId: number) {
-    this.spinner.show();
-    const query = this.stateService.destroyState(stateId);
-    query.then((data:any) => {
-      console.log(data)
-      this.savedStates = data;
-      setTimeout(() => {  
-        this.changeStateStatus.emit(-1);
-        this.statesChanged.emit();
-        this.spinner.hide();
-      },
-      1000);
-    });
+    let bool = confirm("Deseja excluir o estado?");
+    if(bool) {
+      this.spinner.show();
+      const query = this.stateService.destroyState(stateId);
+      query.then((data:any) => {
+        console.log(data)
+        this.savedStates = data;
+        setTimeout(() => {  
+          this.changeStateStatus.emit(-1);
+          this.statesChanged.emit();
+          this.spinner.hide();
+        },
+        1000);
+      });
+    }
   }
 }

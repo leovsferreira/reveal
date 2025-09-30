@@ -23,7 +23,7 @@
   
 .mode-control {
     position: absolute;
-    left: 3%;
+    left: 1%;
     width: 80px;
     display: flex;
     border: solid;
@@ -31,4 +31,13 @@
     border-radius: 5px;
     border-color: rgba(218, 223, 225, 0.8) !important;
     z-index: 2;
+}
+
+.help-icon {
+    color: rgba(149, 165, 166, 1);
+    cursor: pointer;
+    position: absolute;
+    left: calc(1% + 86px);
+    top: 41px;
+    z-index: 100;
 }

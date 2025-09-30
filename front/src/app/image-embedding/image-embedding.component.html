@@ -1,11 +1,14 @@
 <div class="mode-control">
-    <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'pan' ? '#eee' : '#fff' " type="button" (click)="this.setMode('pan')">
+    <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'pan' ? '#eee' : '#fff' " type="button" (click)="this.setMode('pan')"
+        matTooltip="Select individual points in the image embedding to analyze specific data points in detail.">
         <span class="fa-solid fa-arrow-pointer"
-        [style.color]="this.wichModeSelected == 'pan' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+        [style.color]="this.wichModeSelected == 'pan' ? '#97a97c' : 'rgba(149, 165, 166, 1)' "></span>
     </button>
-    <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'area' ? '#eee' : '#fff' " type="button" (click)="this.setMode('area')">
+    <button class="btn btn-custom" [style.background-color]="this.wichModeSelected == 'area' ? '#eee' : '#fff' " type="button" (click)="this.setMode('area')"
+        matTooltip="Select a group of points in the image embedding by defining an area to analyze multiple data points simultaneously.">
         <span class="fa-solid fa-vector-square"
-        [style.color]="this.wichModeSelected == 'area' ? '#00AFC1' : 'rgba(149, 165, 166, 1)' "></span>
+        [style.color]="this.wichModeSelected == 'area' ? '#97a97c' : 'rgba(149, 165, 166, 1)' "></span>
     </button>
 </div>
+<mat-icon matTooltip="The image embedding arranges the query results in a 2D space as points, positioning images with similar characteristics close to each other." class="help-icon">help</mat-icon>
 <div class="fill" id="image-embedding-div" #imageEmbedding></div>

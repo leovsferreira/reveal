@@ -7,7 +7,15 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LightgalleryModule } from 'lightgallery/angular';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { ModalModule, BsModalService } from 'ngx-bootstrap/modal'
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { AppComponent } from './app.component';
 import { ImageEmbeddingComponent } from './image-embedding/image-embedding.component';
@@ -36,6 +44,7 @@ import { AuthService } from './shared/services/auth.service';
 import { BucketComponent } from './bucket/bucket.component';
 import { StateComponent } from './state/state.component';
 import { ModelGalleryComponent } from './model-gallery/model-gallery.component';
+import { CombinedEmbeddingComponent } from './combined-embedding/combined-embedding.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +64,7 @@ import { ModelGalleryComponent } from './model-gallery/model-gallery.component';
     BucketComponent,
     StateComponent,
     ModelGalleryComponent,
+    CombinedEmbeddingComponent,
   ],
   imports: [
     BrowserModule,
@@ -66,6 +76,14 @@ import { ModelGalleryComponent } from './model-gallery/model-gallery.component';
     LightgalleryModule,
     NgxSpinnerModule,
     MatSidenavModule,
+    MatSliderModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatCheckboxModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
     AngularFirestoreModule,
