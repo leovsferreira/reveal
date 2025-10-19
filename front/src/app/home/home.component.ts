@@ -443,7 +443,7 @@ export class HomeComponent implements AfterViewInit {
     if(selectedImagesIds.length > 0) {
       for(let i = 0; i < selectedImagesIds.length; i++) {
         imageIndices.push(this.imageEmbedding.dataset.metadata[selectedImagesIds[i]].labelIndex);
-        imageLabels.push(`dataset/images_USA/${this.imageEmbedding.dataset.labelPaths[selectedImagesIds[i]][0]}`);
+        imageLabels.push(`dataset/llm/processed/${this.imageEmbedding.dataset.labelPaths[selectedImagesIds[i]][0]}`);
       };
     }
 

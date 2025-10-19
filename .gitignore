@@ -1,11 +1,5 @@
 back/dataset/
-back/image_tensors.pt
-back/word_tensors.pt
-back/multi_clip_image_tensors.pt
-back/multi_clip_word_tensors.pt
-back/multi_clip_image_tensors_sidewalk.pt
-back/multi_clip_word_tensors_sidewalk.pt
-back/joint_embeddings_sidewalk.pt
+back/__pycache__
 node_modules/
 package-lock.json
 package.json
