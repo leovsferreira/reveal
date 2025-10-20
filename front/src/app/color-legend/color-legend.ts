@@ -18,10 +18,8 @@ export class ColorLegend {
     }
 
     initSvg() {
-        // dimensions using margins convention
         this.width = this.legendDiv.clientWidth;
         this.height = this.legendDiv.clientHeight;
-        // creates the new canvas element
         this.svgCanvas = d3.select(this.legendDiv)
             .append('svg')
             .attr('width', this.legendDiv.clientWidth)

@@ -53,7 +53,7 @@ export class BucketComponent implements OnInit {
   }
 
   destroyBucket(bucketId: number) {
-    let bool = confirm("Deseja excluir este bucket?");
+    let bool = confirm("Would you like to exclude this bucket?");
     if(bool) {
       this.spinner.show();
       const query = this.bucketService.destroyUserBucket(bucketId);

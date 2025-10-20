@@ -72,7 +72,6 @@ export class HomeComponent implements AfterViewInit {
   
   ngOnInit(): void {
     this.spinner.show();
-    //BUCKEET ELEEMENTN LOAD
     const userCollection = (JSON.parse(localStorage.getItem('user_collection')!));
 
     if(userCollection !== null) {
@@ -97,7 +96,6 @@ export class HomeComponent implements AfterViewInit {
   ngAfterViewInit(): void { 
 
     enableRipple(true);
-    //inicializa menu para force graph
     const menuItemsForceGraph: MenuItemModel[] = [
     {
         text: 'Union',
@@ -121,10 +119,8 @@ export class HomeComponent implements AfterViewInit {
         items: menuItemsForceGraph,
         select: this.onForceGraphMenuItemSelect.bind(this)
     };
-    // Initialize ContextMenu component.
     const ForceGraph: ContextMenu = new ContextMenu(menuOptionsForceGraph, '#contextmenu-force-graph')
 
-    //inicializa menu para image-embedding
     const menuItemsInterfaceSearch: MenuItemModel[] = [{
         text: 'Search',
         id: 'src'
@@ -148,13 +144,11 @@ export class HomeComponent implements AfterViewInit {
       const textEmbedding: ContextMenu = new ContextMenu(menuOptionsTextEmbedding, '#contextmenu-text-embedding')
       const ImageEmbedding: ContextMenu = new ContextMenu(menuOptionsImageEmbedding, '#contextmenu-image-embedding')
       const CombinedEmbedding: ContextMenu = new ContextMenu(menuOptionsCombinedEmbedding, '#contextmenu-combined-embedding')
-      //inicializa menu para a galeria de imagens ou palavras
       let menuOptionsGalleries: ContextMenuModel = {
         target: '#gallery-div',
         items:menuItemsInterfaceSearch,
         select: this.onInterfaceSearch.bind(this)
        };
-      // Initialize ContextMenu component.
       const Galleries: ContextMenu = new ContextMenu(menuOptionsGalleries, '#contextmenu-galleries')
 
       setTimeout(() => {  
@@ -183,9 +177,7 @@ export class HomeComponent implements AfterViewInit {
       this.spinner.show();
       const res = await this.api.getData(this.Query);
       const schema = this.forceGraph.schema;
-      //tira as seleções caso já tenha buscado uma vez
       if (schema.query.length > 0) { this.onSelectionsClear() };
-      //grava o resultado da busca 
       schema.query.push(this.Query);
       schema.number_of_queries += 1;
       schema.imagesIds = res.images.labels;
@@ -194,7 +186,6 @@ export class HomeComponent implements AfterViewInit {
       schema.imagesSimilarities = res.images.similarities;
       schema.similarityValue = res.images.similarityValue;
       this.forceGraph.schema = schema;
-      //starta os embeddings
       this.forceGraph.addNode('searchbar');
       this.imageEmbedding.setupImageEmbedding(res.images);
       this.textEmbedding.setupTextEmbedding(res.texts);
@@ -208,7 +199,6 @@ export class HomeComponent implements AfterViewInit {
     } else {
       alert("Query empty")
     }
-    //reseta o formulário
     this.texts = [];
     this.images = [];
     this.searchForm.reset();
@@ -224,7 +214,6 @@ export class HomeComponent implements AfterViewInit {
       this.StateQuery.textsSimilarities = idsAndSimilarities[3];
       this.StateQuery.similarityValue = this.similarityValue;
       this.onSelectionsClear();
-      //solicita imagens e textos de acordo com o id das imagens
       const res = await this.api.getState(this.StateQuery);
       if(res.images.similarities.length > 0 && res.texts.similarities.length > 0) {
         this.imageEmbedding.setupImageEmbedding(res.images);
@@ -254,9 +243,7 @@ export class HomeComponent implements AfterViewInit {
     const res = await this.api.getData(this.EmbeddingQuery);
     const schema = this.forceGraph.schema;
     
-    //tira as seleções caso já tenha buscado uma vez
     if (schema.query.length > 0) { this.onSelectionsClear() };
-    //grava o resultado da busca 
     schema.query.push(this.EmbeddingQuery);
     schema.number_of_queries += 1;
     schema.imagesIds = res.images.labels;
@@ -265,9 +252,7 @@ export class HomeComponent implements AfterViewInit {
     schema.imagesSimilarities = res.images.similarities;
     schema.similarityValue = res.images.similarityValue;
     this.forceGraph.schema = schema;
-    //adiciona no
     this.forceGraph.addNode('interface');
-    //starta os embeddings
     this.imageEmbedding.setupImageEmbedding(res.images);
     this.textEmbedding.setupTextEmbedding(res.texts);
     this.combinedEmbedding.setupCombinedEmbedding(res.images, res.texts);
@@ -329,7 +314,6 @@ export class HomeComponent implements AfterViewInit {
   }
 
   onSelectionsClear() {
-      //clearing everything linked to images
       if(this.imageEmbedding.scatterGl) {
         this.highlightImageGallery([]);
         this.imageEmbedding.selectedPoints = [];
@@ -338,7 +322,6 @@ export class HomeComponent implements AfterViewInit {
         this.imageEmbedding.highlightTexts([]);
       }
 
-      //clearing everything linked to texts
       if(this.textEmbedding.scatterGl) {
         this.highlightWordCloud([]);
         this.textEmbedding.selectedPoints = [];
@@ -347,7 +330,6 @@ export class HomeComponent implements AfterViewInit {
         this.textEmbedding.highlightImages([]);
       }
 
-      //clearing everything for the combined embedding
       if(this.combinedEmbedding.scatterGl) {
         this.highlightWordCloud([]);
         this.combinedEmbedding.selectedPointsImages = [];

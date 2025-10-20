@@ -68,7 +68,7 @@ export class StateComponent implements OnInit {
   }
 
   destroyState(stateId: number) {
-    let bool = confirm("Deseja excluir o estado?");
+    let bool = confirm("Do you want to exclude this state?");
     if(bool) {
       this.spinner.show();
       const query = this.stateService.destroyState(stateId);

@@ -273,9 +273,9 @@ export class CombinedEmbeddingComponent implements OnInit {
       this.scatterGl.setPointColorer((i: any, selectedIndices: any, hoverIndex: any) => {
         const isSelected = this.selectedPointsImages.includes(i) || this.selectedPointsTexts.includes(i);
         const isHighlited = this.highlightedIndicesImages.includes(i) || this.highlightedIndicesTexts.includes(i);
-        if(hoverIndex === i) return 'rgba(118, 11, 79, 0.7)'; // hover roxo
-        else if(isSelected) return "hsla(120,100%,50%,1)"; // lime
-        else if(isHighlited) return "hsl(240, 100%, 50%)"; // blue
+        if(hoverIndex === i) return 'rgba(118, 11, 79, 0.7)';
+        else if(isSelected) return "hsla(120,100%,50%,1)";
+        else if(isHighlited) return "hsl(240, 100%, 50%)";
         else return this.valToColor(data[i]);
       });
     } else {
