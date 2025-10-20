@@ -80,8 +80,8 @@ export class ImageGalleryComponent implements OnInit {
     const paths = data.labelPaths;
     const ids = data.labels;
     for(let i = 0; i < paths.length; i++) {
-      this.allImages.push({src: `https://storage.googleapis.com/trabalho_final/dataset/images_USA/${paths[i]}`,
-                       thumb: `https://storage.googleapis.com/trabalho_final/dataset/thumbnails_USA/${paths[i]}`, 
+      this.allImages.push({src: `https://storage.googleapis.com/trabalho_final/dataset/llm/processed/${paths[i]}`,
+                       thumb: `https://storage.googleapis.com/trabalho_final/dataset/llm/thumbnails/${paths[i]}`, 
                        id: ids[i], 
                        index: i, 
                        width: 93, 
@@ -215,7 +215,7 @@ export class ImageGalleryComponent implements OnInit {
 
   onAfterSlide = (detail: any): void => {
     const image = document.getElementsByClassName("lg-thumb-item active")[0].children[0] as HTMLImageElement;
-    const string = image.src.replace("https://storage.googleapis.com/trabalho_final/dataset/thumbnails_USA/","")
+    const string = image.src.replace("https://storage.googleapis.com/trabalho_final/dataset/llm/thumbnails/","")
     this.getInfo.emit(string);
   };
 }

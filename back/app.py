@@ -8,10 +8,19 @@ from utils import build_text_tokenizer, calculate_similarities, get_indices, bui
 from itertools import chain
 from flask import current_app
 
-# declare constants
+
+def load_images_df(path='./dataset/files/data_final.json'):
+    df = pd.read_json(path)
+    df = df.reset_index(drop=True)
+    return df
+
+def load_texts_df(path='./dataset/files/unique_words_final.json'):
+    df = pd.read_json(path)
+    df = df.reset_index(drop=True)
+    return df
+
 HOST = '0.0.0.0'
 PORT = 8001
-# initialize flask application
 app = Flask(__name__)
 app.image_encoder, app.image_preprocess = build_image_encoder()
 app.text_encoder = build_text_encoder()
@@ -22,24 +31,19 @@ CORS(app)
 
 @app.route('/api/search', methods=['POST'])
 def search():
-    # get parameters from request
     parameters = request.get_json()
-    # reading datasets
-    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0")
-    unique_texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0")
-    # load image embedding
-    image_embedding = torch.load('multi_clip_image_tensors.pt', map_location=current_app.torch_device)
-    # load word embedding
-    word_embedding = torch.load('multi_clip_word_tensors.pt', map_location=current_app.torch_device)
+    images = load_images_df('./dataset/files/data_final.json')
+    unique_texts = load_texts_df('./dataset/files/unique_words_final.json')
+
+    image_embedding = torch.load('./dataset/files/multi_clip_images_embedding.pt', map_location=current_app.torch_device)
+    word_embedding = torch.load('./dataset/files/multi_clip_words_embedding.pt', map_location=current_app.torch_device)
 
     query_type = parameters['queryType']
     similarity_value = parameters['similarityValue'] / 100
     
     tensors = build_tensors(parameters, query_type, current_app.torch_device, current_app.image_encoder, current_app.image_preprocess, current_app.text_encoder, current_app.text_tokenizer)
     
-    # Calculate similarities
     similarities = calculate_similarities(tensors, image_embedding, word_embedding, query_type, current_app.torch_device)
-    # Normalize similarities
     similarities = [normalize_similarities(sim) for sim in similarities]
     
     similarities_im, similarities_wo = [], []
@@ -58,7 +62,6 @@ def search():
     indices_wo = [int(i) for i in indices_wo]
     words_sim = list(np.around(np.array(words_sim), 4))
     
-    # Selecting images and texts based on indices
     images = images.iloc[indices_im, :]
     unique_texts = unique_texts.iloc[indices_wo, :]
     
@@ -72,15 +75,18 @@ def search():
     
     return jsonify({'texts': word_data, 'images': image_data})
 
-def format_image_data(images, indices_im, images_sim, parameters):
-    image_index = images.index.tolist()
-    images = images.to_numpy()
-    image_coords = images[:, [2, 3]].tolist()
-    image_path = images[:, [0]].tolist()
-    text_ids = [
-                list(map(int, img[1].split(','))) if isinstance(img[1], str) and img[1] else [-1]
-                for img in images
-            ]
+def format_image_data(images_df, indices_im, images_sim, parameters):
+    image_index = images_df.index.tolist()
+
+    image_coords = images_df[['x', 'y']].to_numpy().tolist()
+    image_path = images_df[['filename']].to_numpy().tolist()
+    text_ids_series = images_df['text_ids'] if 'text_ids' in images_df.columns else pd.Series([[]]*len(images_df), index=images_df.index)
+    text_ids = []
+    for v in text_ids_series.tolist():
+        if isinstance(v, list) and len(v) > 0:
+            text_ids.append([int(x) for x in v])
+        else:
+            text_ids.append([-1])
 
     return {
         "similarities": images_sim,
@@ -89,15 +95,21 @@ def format_image_data(images, indices_im, images_sim, parameters):
         "labelPaths": image_path,
         "numberOfImages": len(image_index),
         "textIds": text_ids,
-        "similarityValue": parameters['similarityValue'] / 100
+        "similarityValue": parameters['similarityValue'] / 100.0
     }
 
-def format_word_data(unique_texts, indices_wo, words_sim, indices_im, parameters):
-    word_index = unique_texts.index.tolist()
-    unique_texts = unique_texts.to_numpy()
-    word_coords = unique_texts[:, [2, 3]].tolist()
-    word_labels = unique_texts[:, [0]].tolist()
-    image_ids = [list(map(int, txt[1].split(','))) if txt[1] else [-1] for txt in unique_texts]
+def format_word_data(unique_texts_df, indices_wo, words_sim, indices_im, parameters):
+    word_index = unique_texts_df.index.tolist()
+    word_coords = unique_texts_df[['x', 'y']].to_numpy().tolist()
+    word_labels = unique_texts_df[['word']].to_numpy().tolist()
+
+    image_ids_series = unique_texts_df['image_ids'] if 'image_ids' in unique_texts_df.columns else pd.Series([[]]*len(unique_texts_df), index=unique_texts_df.index)
+    image_ids = []
+    for v in image_ids_series.tolist():
+        if isinstance(v, list) and len(v) > 0:
+            image_ids.append([int(x) for x in v])
+        else:
+            image_ids.append([-1])
 
     return {
         "similarities": words_sim,
@@ -107,14 +119,14 @@ def format_word_data(unique_texts, indices_wo, words_sim, indices_im, parameters
         "projection": word_coords,
         "imageIds": image_ids,
         "imageIndices": indices_im,
-        "similarityValue": parameters['similarityValue'] / 100
+        "similarityValue": parameters['similarityValue'] / 100.0
     }
 
 @app.route('/api/state', methods=['POST'])
 def get_state():
     parameters = request.get_json()
-    images = pd.read_csv('multi_clip_images.csv', index_col="Unnamed: 0")
-    texts = pd.read_csv('multi_clip_unique_texts.csv', index_col="Unnamed: 0")
+    images = load_images_df('./dataset/files/data_final.json')
+    texts = load_texts_df('./dataset/files/unique_words_final.json')
     image_ids = parameters['imagesIds']
     text_ids = parameters['textsIds']
 
@@ -171,9 +183,12 @@ def aggregate_sets(image_ids, im_sim, text_ids, wo_sim, set_type):
 def get_info():
     parameters = request.get_json()
     image_path = parameters['string']
-    df = pd.read_csv("usa_final_texts.csv")
-    text = df.loc[df['image_paths'] == image_path, 'text'].item()
-    return jsonify(text)
+    images = load_images_df('./dataset/files/data_final.json')
+
+    match = images.loc[images['filename'] == image_path, 'output']
+    if len(match) == 0:
+        return jsonify(""), 200
+    return jsonify(match.iloc[0])
 
 if __name__ == '__main__':
     app.run(host=HOST, debug=True, port=PORT)

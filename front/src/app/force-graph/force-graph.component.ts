@@ -164,7 +164,6 @@ export class ForceGraphComponent implements OnInit {
                                     iteractionType: 0,
                                     from: from
                                   });
-    //se foi interação de interface, manter no mesmo ramo
     if(from == 'interface') {
       if (this.parentNode.size !== 0) {
         //@ts-ignore
@@ -179,7 +178,6 @@ export class ForceGraphComponent implements OnInit {
   }
 
   reset() {
-    //reseta quando clicado no botão de reset estado
     this.nodeId = 0;
     this.schema.number_of_queries = 0;
     this.selectedNodes.clear();
@@ -195,7 +193,6 @@ export class ForceGraphComponent implements OnInit {
     } else {
       const idNodeList: any = [];
       this.selectedNodes.forEach((node: any) => {
-        //refaz lista somente com nós que não foram deletados
         const indexNode = this.forceGraphData.nodes.indexOf(node);
         if (indexNode > -1) { 
           idNodeList.push(node.id)
@@ -204,7 +201,6 @@ export class ForceGraphComponent implements OnInit {
       });
       console.log(idNodeList)
       console.log(this.forceGraphData.links)
-      //refaz lista somente com links que não foram deletados
       const newLinksList: any = [];
       for(let i = 0; i < idNodeList.length; i++) {
   
@@ -219,10 +215,8 @@ export class ForceGraphComponent implements OnInit {
   
       this.forceGraphData.links = newLinksList;
       console.log(this.forceGraphData.links)
-      //seta novo dado para renderizar no grafo
       this.forceGraph.graphData(this.forceGraphData);
       this.selectedNodes.clear();
-      //seta parent node para o último criado antes de deeletar
       this.parentNode.clear();
 
       /**
@@ -232,7 +226,6 @@ export class ForceGraphComponent implements OnInit {
       if(this.forceGraphData.nodes.length > 0) {
         const node = this.forceGraphData.nodes[this.forceGraphData.nodes.length - 1]
         this.parentNode.add(node);
-        //muda o estado da interface para ultimo no criado antes de deletar
         this.currentMainNode = node;
         this.embeddingState.emit([this.currentMainNode.imagesIds,
                                   this.currentMainNode.imagesSimilarities, 
@@ -245,7 +238,6 @@ export class ForceGraphComponent implements OnInit {
   }  
 
   buildNewNode(type: string, nodes: any) {
-    //adiciona informações
     const imagesIds:any = [];
     const textsIds:any = [];
     const imagesSimilarities: any = [];
@@ -298,7 +290,6 @@ export class ForceGraphComponent implements OnInit {
         textsIds.push(diffTextsIds[i]);
       }
     }
-    //seta queryType
     if(queryTypes[0] == queryTypes[1]) queryType = queryTypes[0];
     else queryType = 2;
     const nodeId = this.nodeId;
@@ -339,7 +330,6 @@ export class ForceGraphComponent implements OnInit {
                               imagesSimilarities,
                               textsIds,
                               textsSimilarities]);
-    //adiciona nó ao dado
     this.forceGraphData.nodes.push({id: nodeId,
                                     textsQuery: textsQuery, 
                                     imagesQuery: imagesQuery, 
@@ -353,14 +343,11 @@ export class ForceGraphComponent implements OnInit {
                                     from: 'set'
                                   });
     
-    //seta como novo parent node
     this.parentNode.clear();
     this.parentNode.add(this.forceGraphData.nodes[this.forceGraphData.nodes.length - 1]);
-    //adiciona links dos nos selecionados ao novo nó
     this.selectedNodes.forEach((selectedNode: any) => {
       this.forceGraphData.links.push({source: selectedNode.id, target: nodeId});
     });
-    //atualiza o grafo  com novo nó
     this.forceGraph.graphData(this.forceGraphData);
     this.nodeId += 1;
     this.selectedNodes.clear();
@@ -373,7 +360,6 @@ export class ForceGraphComponent implements OnInit {
     });
     this.forceGraphData = {nodes: state.nodes, links: state.links};
     this.forceGraph.graphData({nodes: state.nodes, links: state.links});
-    //se o no salvo for vazio, seta vazio nas visualizacoes
     if(state.nodes.length > 0) {
       const node = state.nodes[state.nodes.length - 1];
       const lastNodeId = state.nodes[state.nodes.length - 1].id + 1
@@ -522,17 +508,15 @@ export class ForceGraphComponent implements OnInit {
                 ctx.fill();
               }
 
-              // Draw the node
               ctx.fillStyle = color;
               ctx.beginPath();
-              ctx.arc(x, y, radius, 0, 2 * Math.PI, false); // Use the adjusted radius
+              ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
               ctx.fill();
 
-              // Draw the node ID inside the node
               ctx.fillStyle = "#FFFFFF";
               ctx.textAlign = "center";
               ctx.textBaseline = "middle";
-              ctx.font = '6px Roboto'; // Increased font size
+              ctx.font = '6px Roboto';
               ctx.fillText(node.id + 1, x, y);
       }
     ][0]();
@@ -547,21 +531,21 @@ export class ForceGraphComponent implements OnInit {
       if(this.selectedNodes.size > 1) {
         this.buildNewNode('union', this.selectedNodes);
       } else {
-        console.log('precisa de pelo menos 2 nós selecionados para uniao')
+        console.log('at least two nodes have to be selected to perform an union operation')
         this.selectedNodes.clear();
       }
     } else if(type == 'in') {
       if(this.selectedNodes.size > 1) {
         this.buildNewNode('intersection', this.selectedNodes);
       } else {
-        console.log('precisa de pelo menos 2 nós selecionados para intersecao')
+        console.log('at least two nodes have to be selected to perform an intersection operation')
         this.selectedNodes.clear();
       }
     } else if(type == 'del') {
       if(this.selectedNodes.size > 0) {
         this.removeNode();
       } else {
-        console.log('precisa de pelo menos 1 nó selecionado para remoção');
+        console.log('at least one node needs to be selected in order to remove a node');
         this.selectedNodes.clear();
       }
     } else {
@@ -569,7 +553,7 @@ export class ForceGraphComponent implements OnInit {
       if(this.selectedNodes.size == 2) {
         this.buildNewNode('difference', this.selectedNodes);
       } else {
-        console.log('precisa de exatamente 2 nós para diferença')
+        console.log('exactly two nodes are necessary to compute the difference')
         this.selectedNodes.clear();
       }
     }
