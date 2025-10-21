@@ -45,5 +45,5 @@
 }
 
 ::ng-deep .modal {
-    z-index: 99999;
+    z-index: 1050;
 }
