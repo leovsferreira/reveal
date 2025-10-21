@@ -162,7 +162,7 @@
     top: 16px;
     left: 22px;
     width: 323px;
-    height: 436px !important;
+    height: 176px !important; /*436px*/
     z-index: -10;
   }
   

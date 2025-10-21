@@ -38,6 +38,12 @@ Next, create the following repositories in the back folder
 
 /dataset/files/
 
-paste the 
+transfer tensor files generated in the reveal preprocessing pipeline into the folder and also data_final.json and unique_texts_final.json
 
-/dataset/processed/
+then create the following repository
+
+/dataset/llm/
+
+copy the /processed/ and the /thumbnails/ folder with all images inside the /llm/ folder
+
+
