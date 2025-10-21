@@ -4,7 +4,6 @@ import { ApiService } from 'src/app/shared/api.service';
 import { BuildSetQuery } from '../shared/api.models';
 import ForceGraph from 'force-graph';
 import * as d3 from "d3";
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf';
 
 @Component({
   selector: 'app-force-graph',
@@ -37,7 +36,6 @@ export class ForceGraphComponent implements OnInit {
   constructor(public global: GlobalService, public api: ApiService) { }
 
   async ngOnInit(): Promise<void> { 
-    GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(await import('pdfjs-dist/package.json')).version}/pdf.worker.min.js`;
   }
 
   ngAfterViewInit(): void {
