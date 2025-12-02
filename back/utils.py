@@ -6,11 +6,12 @@ from PIL import Image
 from io import BytesIO
 import numpy as np
 import pandas as pd
+import torchvision.transforms as T
 
+# --- DEVICE & MODEL SETUP ---
 
 def get_torch_device():
     return "cuda" if torch.cuda.is_available() else "cpu"
-
 
 def build_image_encoder():
     device = get_torch_device()
@@ -18,23 +19,79 @@ def build_image_encoder():
     model.eval()
     return model, preprocess
 
-
 def build_text_encoder():
     device = get_torch_device()
     model, _ = clip.load("ViT-B/32", device=device)
     model.eval()
     return model
 
-
 def build_text_tokenizer():
     return clip.tokenize
 
+# --- DINOv2 SETUP ---
+
+# Standard ImageNet normalization for DINOv2
+dinov2_transform = T.Compose([
+    T.Resize(256, interpolation=T.InterpolationMode.BICUBIC),
+    T.CenterCrop(224),
+    T.ToTensor(),
+    T.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+])
+
+def build_dinov2_model():
+    device = get_torch_device()
+    print(f"Loading DINOv2 on {device}...")
+    # Load ViT-Small (vits14) for balance of speed/performance
+    model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14').to(device)
+    model.eval()
+    return model
+
+def build_dinov2_query_tensor(images, from_where, device, model):
+    """
+    Processes query images using DINOv2 transforms and encoder.
+    Returns a normalized, averaged tensor.
+    """
+    tensors = []
+    
+    for img_source in images:
+        img = None
+        try:
+            if from_where == 'searchbar':
+                # Handle Base64 string
+                image_data = re.sub('^data:image/.+;base64,', '', img_source)
+                img = Image.open(BytesIO(base64.b64decode(image_data))).convert('RGB')
+            else:
+                # Handle File Path
+                img = Image.open(img_source).convert('RGB')
+            
+            tensors.append(dinov2_transform(img))
+        except Exception as e:
+            print(f"Error processing DINO image: {e}")
+            continue
+
+    if not tensors:
+        return None
+
+    # Stack into batch (N, 3, 224, 224)
+    batch = torch.stack(tensors).to(device)
+    
+    with torch.no_grad():
+        embedding = model(batch) # Output: (N, 384) for ViT-S
+        # Normalize
+        embedding = embedding / embedding.norm(dim=-1, keepdim=True)
+        # Average if multiple images provided
+        mean_embedding = torch.mean(embedding, dim=0, keepdim=True)
+        # Re-normalize result
+        return mean_embedding / mean_embedding.norm(dim=-1, keepdim=True)
+
+# --- CLIP TENSOR BUILDING ---
 
 def build_tensors(parameters, query_type, device, image_encoder, image_preprocess, text_encoder, text_tokenizer):
     texts = parameters['textsQuery']
     images = parameters['imagesQuery']
     from_where = parameters['from']
     
+    # NOTE: Using torch.mean to average inputs ensures robust "Concept" vectors
     if query_type == 0:
         texts_tensors = build_texts_tensors(texts, text_encoder, text_tokenizer, device)
         return normalize_tensors(torch.mean(texts_tensors, dim=0, keepdim=True))
@@ -50,7 +107,6 @@ def build_tensors(parameters, query_type, device, image_encoder, image_preproces
 
 def build_texts_tensors(texts, model, tokenizer, device):
     texts = [str(t) if str(t).strip() else "[EMPTY]" for t in texts]
-
     with torch.no_grad():
         tokens = tokenizer(texts).to(device)
         text_features = model.encode_text(tokens)
@@ -90,9 +146,9 @@ def normalize_tensors(tensors):
 
 
 def calculate_similarities(tensors, image_embedding, word_embedding, query_type, device):
+    # Standard CLIP Matrix Multiplication
     if query_type == 2:
         texts_tensors, images_tensors = tensors
-
         similarities_im_texts = [image_features.to(device) @ texts_tensors.T for image_features in image_embedding]
         similarities_im_images = [image_features.to(device) @ images_tensors.T for image_features in image_embedding]
         similarities_wo_texts = [text_features.to(device) @ texts_tensors.T for text_features in word_embedding]
@@ -113,11 +169,10 @@ def calculate_similarities(tensors, image_embedding, word_embedding, query_type,
 
 
 def normalize_similarities(similarities):
-    min_val = np.min(similarities)
-    max_val = np.max(similarities)
-    if max_val == min_val:
-        return np.zeros_like(similarities)
-    return (similarities - min_val) / (max_val - min_val)
+    # Return RAW scores. 
+    # With Concept-Based matching and DINOv2, scores are naturally high (0.6 - 0.9).
+    # No artificial scaling needed.
+    return similarities
 
 
 def get_indices(similarities_lists, similarity_value):

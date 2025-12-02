@@ -182,9 +182,13 @@ export class ImageEmbeddingComponent implements OnInit {
 
   colorPoints() {
     console.log(this.selectedPoints)
-    const data = this.dataset['similarities'];
-    // @ts-ignore
-    this.colorScale.domain( [this.dataset["similarityValue"], Math.max( ...data )] );
+    const data: number[] = this.dataset['similarities'];
+    
+    // FIX: Set domain from [MIN, MAX] of actual data, not [Threshold, Max]
+    // This ensures contrast even if all results are packed between 0.40 and 0.48
+    if (data.length > 0) {
+        this.colorScale.domain([Math.min(...data), Math.max(...data)]);
+    }
 
     if(this.wasCtrlKey) {
       this.scatterGl.setPointColorer((i: any, selectedIndices: any, hoverIndex: any) => {
@@ -212,9 +216,12 @@ export class ImageEmbeddingComponent implements OnInit {
   }  
 
   linkImages(ids: any) {
-    const data = this.dataset['similarities']
-    // @ts-ignore
-    this.colorScale.domain( [this.dataset["similarityValue"], Math.max( ...data )] );
+    const data: number[] = this.dataset['similarities']
+    
+    // FIX: Same fix for linkImages - Dynamic Domain
+    if (data.length > 0) {
+        this.colorScale.domain([Math.min(...data), Math.max(...data)]);
+    }
 
     const indices: number[] = [];
     for(let i = 0; i < this.dataset.points.length; i++) {
