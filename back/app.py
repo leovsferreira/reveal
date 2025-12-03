@@ -50,7 +50,7 @@ def search():
     dinov2_image_embedding = torch.load('./dataset/files/dinov2_images_embedding.pt', map_location=current_app.torch_device)
 
     query_type = parameters['queryType']
-    similarity_value = 40 / 100
+    similarity_value = parameters['similarityValue'] / 100
     
     # 1. Calculate CLIP Similarities (Used for Text Logic & Word Clouds)
     tensors = build_tensors(parameters, query_type, current_app.torch_device, current_app.image_encoder, current_app.image_preprocess, current_app.text_encoder, current_app.text_tokenizer)
