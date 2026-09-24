@@ -1,0 +1,45 @@
+#!/bin/sh
+# Blocks commits that contain .env files or API keys.
+# Enabled with: git config core.hooksPath .githooks
+
+status=0
+
+env_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(^|/)\.env$|(^|/)\.env\.[^/]*$' | grep -v '\.env\.example$')
+if [ -n "$env_files" ]; then
+  echo "pre-commit: refusing to commit env files:"
+  echo "$env_files"
+  status=1
+fi
+
+keys_file=$(git diff --cached --name-only --diff-filter=ACMR | grep -E 'src/environments/keys\.ts$')
+if [ -n "$keys_file" ]; then
+  echo "pre-commit: refusing to commit generated $keys_file"
+  status=1
+fi
+
+# Mapbox tokens (pk./sk.), Google/Firebase API keys, private keys
+leaks=$(git diff --cached -U0 --diff-filter=ACMR | grep -E '^\+' | grep -nE '(pk|sk)\.eyJ[A-Za-z0-9_-]{10,}|AIza[0-9A-Za-z_-]{35}|-----BEGIN [A-Z ]*PRIVATE KEY-----')
+if [ -n "$leaks" ]; then
+  echo "pre-commit: possible API key in staged changes:"
+  echo "$leaks" | cut -c1-120
+  status=1
+fi
+
+# Any value kept in front/.env (whatever its format) must never appear in a commit
+if [ -f front/.env ]; then
+  added=$(git diff --cached -U0 --diff-filter=ACMR | grep -E '^\+')
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in ''|\#*) continue ;; esac
+    value=$(printf '%s' "${line#*=}" | tr -d '\r' | sed -e 's/^["'\'']//' -e 's/["'\'']$//')
+    [ ${#value} -lt 8 ] && continue
+    if printf '%s\n' "$added" | grep -qF -- "$value"; then
+      echo "pre-commit: staged changes contain the value of ${line%%=*} from front/.env"
+      status=1
+    fi
+  done < front/.env
+fi
+
+if [ $status -ne 0 ]; then
+  echo "Move the key to front/.env instead. (Bypass only if you are sure: git commit --no-verify)"
+fi
+exit $status

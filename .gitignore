@@ -4,3 +4,8 @@ node_modules/
 schema.xml
 case_study
 video
+# Secrets - keys live in front/.env (see front/.env.example)
+.env
+.env.*
+!.env.example
+front/src/environments/keys.ts

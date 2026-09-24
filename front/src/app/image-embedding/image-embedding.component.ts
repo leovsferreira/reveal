@@ -1,3 +1,4 @@
+import { environment } from 'src/environments/environment';
 import { Component, OnInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { GlobalService } from 'src/app/shared/global.service';
 import * as ScatterGL from 'scatter-gl';
@@ -86,7 +87,7 @@ export class ImageEmbeddingComponent implements OnInit {
             });
             
             this.tooltip.setProps({
-              content: `<img style="max-width: 128px; max-height: 128px;" src="https://storage.googleapis.com/trabalho_final/dataset/llm/processed/${imagePath}"></img>`,
+              content: `<img style="max-width: 128px; max-height: 128px;" src="${environment.imagesUrl}/processed/${imagePath}"></img>`,
               allowHTML: true,
               getReferenceClientRect: () => ({
                 width: 0,

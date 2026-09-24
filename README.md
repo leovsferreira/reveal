@@ -61,9 +61,14 @@ cd front
 # Install dependencies with yarn (not npm)
 yarn install
 
-# Run the frontend
-ng serve
+# Add your keys: copy the example and fill in FIREBASE_API_KEY
+cp .env.example .env
+
+# Run the frontend (generates src/environments/keys.ts from .env, then runs ng serve)
+yarn start
 ```
+
+> Keys live only in `front/.env`, which is git-ignored. A pre-commit hook in `.githooks/` blocks commits containing `.env` files or API keys; enable it once per clone with `git config core.hooksPath .githooks`.
 
 Once it compiles successfully, open your browser and visit:
 👉 http://localhost:4200

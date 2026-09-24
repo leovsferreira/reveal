@@ -1,26 +1,48 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
-import * as mapboxgl from 'mapbox-gl';
+import { environment } from 'src/environments/environment';
+import { Component, AfterViewInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
+import * as maplibregl from 'maplibre-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
+
+// mapbox-gl-draw looks for Mapbox's class names (e.g. to handle Enter/Escape/Delete on the canvas); use MapLibre's
+Object.assign(MapboxDraw.constants.classes, {
+  CANVAS: 'maplibregl-canvas',
+  CONTROL_BASE: 'maplibregl-ctrl',
+  CONTROL_PREFIX: 'maplibregl-ctrl-',
+  CONTROL_GROUP: 'maplibregl-ctrl-group',
+  ATTRIBUTION: 'maplibregl-ctrl-attrib'
+});
+
+// MapLibre requires arrays inside expressions to be wrapped in ['literal', ...]; mapbox-gl-draw's default line style doesn't
+const drawStyles = MapboxDraw.lib.theme.map((layer: any) => {
+  const dash = layer.paint?.['line-dasharray'];
+  if (!Array.isArray(dash)) return layer;
+  return {
+    ...layer,
+    paint: {
+      ...layer.paint,
+      'line-dasharray': dash.map((value: any) => Array.isArray(value) && typeof value[0] === 'number' ? ['literal', value] : value)
+    }
+  };
+});
 
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnInit, AfterViewInit {
+export class MapComponent implements AfterViewInit {
   @ViewChild('mapContainer', { static: false }) private mapContainer!: ElementRef;
 
   @Output() polygonsChanged = new EventEmitter<any[]>();
 
-  private map!: mapboxgl.Map;
+  private map!: maplibregl.Map;
   private draw!: MapboxDraw;
-  private accessToken = 'pk.eyJ1IjoibGVvdnNmIiwiYSI6ImNqZDI0NjFmajBwaWwycXBheDg1NHFiczEifQ.7oGXJmnvyx-9ahJw4n9VSg';
-  private style = 'mapbox://styles/leovsf/cmi7uzuzt002e01qmdkd15it1';
+  private style = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
   private mapInitialized = false;
   public hasData = false;
   private pendingInit = false;
 
-  private selectionMarkers: mapboxgl.Marker[] = [];
+  private selectionMarkers: maplibregl.Marker[] = [];
   private heatmapData: any = null;
   private locationIndexMap: Map<number, { lon: number, lat: number }> = new Map();
 
@@ -28,10 +50,6 @@ export class MapComponent implements OnInit, AfterViewInit {
   public polygons: any[] = [];
 
   constructor() { }
-
-  ngOnInit(): void {
-    (mapboxgl as any).accessToken = this.accessToken;
-  }
 
   ngAfterViewInit(): void {
     if (this.pendingInit) {
@@ -57,14 +75,14 @@ export class MapComponent implements OnInit, AfterViewInit {
       return;
     }
     
-    console.log('Creating new Mapbox instance');
+    console.log('Creating new map instance');
     
-    this.map = new mapboxgl.Map({
+    this.map = new maplibregl.Map({
       container: this.mapContainer.nativeElement,
       style: this.style,
       center: [-87.6298, 41.8781],
       zoom: 10,
-      attributionControl: false,
+      attributionControl: { compact: true },
       interactive: true,
       scrollZoom: true,
       boxZoom: true,
@@ -73,18 +91,12 @@ export class MapComponent implements OnInit, AfterViewInit {
       keyboard: true,
       doubleClickZoom: true,
       touchZoomRotate: true,
-      touchPitch: true,
-      projection: 'mercator'
+      touchPitch: true
     });
 
     this.map.on('load', () => {
       console.log('Map load event fired');
-      
-      const logo = this.mapContainer.nativeElement.querySelector('.mapboxgl-ctrl-logo');
-      if (logo) {
-        (logo as HTMLElement).style.display = 'none';
-      }
-      
+
       this.map.resize();
       
       if (this.heatmapData) {
@@ -107,10 +119,11 @@ export class MapComponent implements OnInit, AfterViewInit {
     this.draw = new MapboxDraw({
       displayControlsDefault: false,
       controls: {},
-      defaultMode: 'simple_select'
+      defaultMode: 'simple_select',
+      styles: drawStyles
     });
     
-    this.map.addControl(this.draw, 'top-right');
+    this.map.addControl(this.draw as unknown as maplibregl.IControl, 'top-right');
 
     this.map.on('draw.create', (e) => this.onPolygonCreated(e));
     this.map.on('draw.delete', (e) => this.onPolygonDeleted(e));
@@ -267,7 +280,7 @@ export class MapComponent implements OnInit, AfterViewInit {
       console.log('Removing existing map instance');
       
       if (this.draw) {
-        this.map.removeControl(this.draw);
+        this.map.removeControl(this.draw as unknown as maplibregl.IControl);
         this.draw = null as any;
       }
       
@@ -517,15 +530,15 @@ export class MapComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    const marker = new mapboxgl.Marker({
+    const marker = new maplibregl.Marker({
       color: '#97a97c',
       scale: 1.2
     })
       .setLngLat([lng, lat])
       .addTo(this.map);
 
-    const popupContent = `https://storage.googleapis.com/trabalho_final/dataset/llm/processed/${imageIndex}.jpg`;
-    const popup = new mapboxgl.Popup({ 
+    const popupContent = `${environment.imagesUrl}/processed/${imageIndex}.jpg`;
+    const popup = new maplibregl.Popup({ 
       offset: 25,
       closeButton: false
     })

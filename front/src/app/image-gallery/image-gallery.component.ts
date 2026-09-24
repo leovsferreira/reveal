@@ -1,3 +1,4 @@
+import { environment } from 'src/environments/environment';
 import { Component, OnInit, ElementRef, ViewChild, Output, EventEmitter, TemplateRef } from '@angular/core';
 import { LightGallery } from 'lightgallery/lightgallery';
 import lgZoom from 'lightgallery/plugins/zoom';
@@ -92,8 +93,8 @@ export class ImageGalleryComponent implements OnInit {
     
     for(let i = 0; i < paths.length; i++) {
       this.allImages.push({
-        src: `https://storage.googleapis.com/trabalho_final/dataset/llm/processed/${paths[i]}`,
-        thumb: `https://storage.googleapis.com/trabalho_final/dataset/llm/thumbnails/${paths[i]}`, 
+        src: `${environment.imagesUrl}/processed/${paths[i]}`,
+        thumb: `${environment.imagesUrl}/thumbnails/${paths[i]}`, 
         id: ids[i], 
         index: i, 
         width: 80, 
@@ -221,7 +222,7 @@ export class ImageGalleryComponent implements OnInit {
 
   onAfterSlide = (detail: any): void => {
     const image = document.getElementsByClassName("lg-thumb-item active")[0].children[0] as HTMLImageElement;
-    const string = image.src.replace("https://storage.googleapis.com/trabalho_final/dataset/llm/thumbnails/","")
+    const string = image.src.replace(`${environment.imagesUrl}/thumbnails/`, "")
     this.getInfo.emit(string);
   };
 }

@@ -75,7 +75,7 @@
   pointer-events: none;
 }
 
-.mapboxgl-ctrl-group {
+.maplibregl-ctrl-group {
   display: none !important;
 }
 

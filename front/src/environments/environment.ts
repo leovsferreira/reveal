@@ -2,13 +2,15 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 // Import the functions you need from the SDKs you need
+import { keys } from "./keys";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
 export const environment = {
   production: false,
+  imagesUrl: "http://localhost:8001/dataset/llm",
   firebase: {
-    apiKey: "AIzaSyDR_7-D6umd-hMNKHxq7IrHQzjTt4CwonE",
+    apiKey: keys.firebaseApiKey,
     authDomain: "projeto-mestrado-cb1e0.firebaseapp.com",
     projectId: "projeto-mestrado-cb1e0",
     storageBucket: "projeto-mestrado-cb1e0.appspot.com",

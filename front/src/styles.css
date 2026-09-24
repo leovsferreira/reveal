@@ -12,7 +12,7 @@
 @import 'tippy.js/themes/translucent.css';
 @import '../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons");
-@import 'mapbox-gl/dist/mapbox-gl.css'; 
+@import 'maplibre-gl/dist/maplibre-gl.css';
 @import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 
 /* You can add global styles to this file, and also import other style files */
@@ -30,4 +30,34 @@
 
 .tippy-box.transparent-background .tippy-content {
     padding: 0 !important; 
+}
+
+/* mapbox-gl-draw cursors, retargeted at MapLibre class names */
+.maplibregl-map.mouse-pointer .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: pointer;
+}
+.maplibregl-map.mouse-move .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: move;
+}
+.maplibregl-map.mouse-add .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: crosshair;
+}
+.maplibregl-map.mouse-move.mode-direct_select .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+.maplibregl-map.mode-direct_select.feature-vertex.mouse-move .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: move;
+}
+.maplibregl-map.mode-direct_select.feature-midpoint.mouse-pointer .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: cell;
+}
+.maplibregl-map.mode-direct_select.feature-feature.mouse-move .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: move;
+}
+.maplibregl-map.mode-static.mouse-pointer  .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
 }

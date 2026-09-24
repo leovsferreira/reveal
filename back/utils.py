@@ -63,10 +63,16 @@ def build_images_tensors(images, device, model, preprocess, from_where):
     if from_where == 'searchbar':
         images_tensors = [process_image_from_base64(image, device, model, preprocess) for image in images]
     else:
-        images_list = [Image.open(image_path) for image_path in images]
+        images_list = [Image.open(to_local_path(image_path)) for image_path in images]
         images_tensors = [process_image(image, device, model, preprocess) for image in images_list]
     
     return torch.cat(images_tensors, dim=0)
+
+
+def to_local_path(image_path):
+    # gallery images arrive as URLs, e.g. http://localhost:8001/dataset/llm/thumbnails/0.jpg
+    index = image_path.find('dataset/llm/')
+    return './' + image_path[index:] if index != -1 else image_path
 
 
 def process_image_from_base64(image, device, model, preprocess):

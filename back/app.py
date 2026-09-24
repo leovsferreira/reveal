@@ -1,5 +1,6 @@
 from enum import unique
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory, abort
+import os
 import torch
 import pandas as pd
 import numpy as np
@@ -19,6 +20,7 @@ def load_texts_df(path='./dataset/files/unique_words_final.json'):
     df = df.reset_index(drop=True)
     return df
 
+IMAGES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dataset', 'llm')
 HOST = '0.0.0.0'
 PORT = 8001
 app = Flask(__name__)
@@ -28,6 +30,12 @@ app.text_tokenizer = build_text_tokenizer()
 app.torch_device = get_torch_device()
 
 CORS(app)
+
+@app.route('/dataset/llm/<folder>/<path:filename>')
+def serve_image(folder, filename):
+    if folder not in ('processed', 'thumbnails'):
+        abort(404)
+    return send_from_directory(os.path.join(IMAGES_DIR, folder), filename)
 
 @app.route('/api/search', methods=['POST'])
 def search():
