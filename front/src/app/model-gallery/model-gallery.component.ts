@@ -35,21 +35,24 @@ export class ModelGalleryComponent implements OnInit {
     }
   }
 
-  openModal(imagesList: any) {
-    for(let i = 0; i < imagesList.length; i++) {
-      this.items.push({src: `${imagesList[i].replace("thumbnails","processed")}`,
-                       thumb: `${imagesList[i]}`, 
-                       index: i,                       
-                       width: 120, 
-                       height: 120, 
-                       margin: 1,
-                       border:'none',
-                       borderColor:'',
-                       borderWidth:'0px'});
-    }
+  openModal(imageUrls: string[]) {
+    this.items = imageUrls.map((url, i) => ({src: url.replace('/thumbnails/', '/processed/'),
+                                             thumb: url,
+                                             index: i,
+                                             width: 120,
+                                             height: 120,
+                                             margin: 1,
+                                             border:'none',
+                                             borderColor:'',
+                                             borderWidth:'0px'}));
 
     this.modalRef = this.modalService.show(this.modalGallery, {class: 'modal-lg'});
     this.isModalOpen = true;
+    // also covers ESC and backdrop clicks, which never call closeModal
+    this.modalRef.onHidden?.subscribe(() => {
+      this.items = [];
+      this.isModalOpen = false;
+    });
   }
 
   onInit = (detail:any): void => {

@@ -3,9 +3,9 @@
     <mat-drawer #drawer class="example-sidenav" mode="side">
         <div class="saved-buckets-div" style="margin-left: 10px;">
             <p>Saved Buckets</p>
-            <div class="saved-buckets-list">
-                <div *ngFor="let bucket of this.bucket.savedBuckets" style="margin-bottom: 10px;">
-                    <div class="bucket-wrapper" id="savedbucket-div-{{bucket.id}}" [attr.data-bucketid]="bucket.id" (contextmenu)="onRightClick(bucket.id, 'bucket')"> 
+            <div class="saved-buckets-list" id="saved-buckets-list">
+                <div *ngFor="let bucket of this.bucket.savedBuckets; trackBy: trackById" style="margin-bottom: 10px;">
+                    <div class="bucket-wrapper" id="savedbucket-div-{{bucket.id}}" [attr.data-bucketid]="bucket.id">
                         <div class="bucket">
                             <span style="color:#97a97c;" class="fas fa-box-open"></span>
                         </div>
@@ -13,22 +13,20 @@
                             {{bucket.name}}
                         </div>
                     </div>
-                    <ul id="contextmenu-savedbucket-{{bucket.id}}"></ul>
                 </div>
             </div>
         </div>
         <div class="saved-states-div" style="margin-left: 10px; margin-top: 10px;">
             <p>Saved States</p>
-            <div class="saved-states-list">
-                <div *ngFor="let state of this.state.savedStates" style="margin-bottom: 10px;">
-                    <div class="state-wrapper" id="state-div-{{state.id}}" [attr.data-stateid]="state.id" (contextmenu)="onRightClick(state.id, 'state')"> 
+            <div class="saved-states-list" id="saved-states-list">
+                <div *ngFor="let state of this.state.savedStates; trackBy: trackById" style="margin-bottom: 10px;">
+                    <div class="state-wrapper" id="state-div-{{state.id}}" [attr.data-stateid]="state.id">
                         <div class="state">
                             <span style="color:#97a97c;" class="fas fa-square-share-nodes"></span>
                         </div>
                         <div class="state-title">
                             {{state.name}}
                         </div>
-                        <ul id="contextmenu-state-{{state.id}}"></ul>
                     </div>
                 </div>
             </div>
@@ -186,14 +184,12 @@
     </div>
 
     <ul id="contextmenu-force-graph"></ul>
+    <ul id="contextmenu-inuse-buckets"></ul>
+    <ul id="contextmenu-saved-buckets"></ul>
+    <ul id="contextmenu-saved-states"></ul>
 
-    <app-bucket
-        (bucketAdded) = "this.setBucketsMenu($event);"
-        (bucketSaved) = "setAllBucketsMenu($event);">
-    </app-bucket>
+    <app-bucket></app-bucket>
     <app-state
-        (statesChanged) = "this.setAllSavedStatesMenu()"
-        (setFy) = "this.setFyToUndefined()"
         (changeStateStatus) = "this.changeState($event)">
     </app-state>
 
@@ -211,7 +207,7 @@
                 </div>
             </div>
             <div class="form-actions session-btn">
-                <button type="button" class="btn" (click)="this.onBucketCreate(bucketName.value)">Create</button>
+                <button type="button" class="btn" [disabled]="this.bucket.busy" (click)="this.onBucketCreate(bucketName.value)">Create</button>
             </div>
             <div class="form-actions session-btn">
                 <button type="button" class="btn" style="background-color: #de5246;" (click)="modalRef.hide()">Close</button>
@@ -233,7 +229,7 @@
                 </div>
             </div>
             <div class="form-actions session-btn">
-                <button type="button" class="btn" (click)="this.onSaveState(stateName.value)">Save</button>
+                <button type="button" class="btn" [disabled]="this.state.busy" (click)="this.onSaveState(stateName.value)">Save</button>
             </div>
             <div class="form-actions session-btn">
                 <button type="button" class="btn" style="background-color: #de5246;" (click)="modalRef.hide()">Close</button>

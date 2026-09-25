@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild, TemplateRef } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 
 import { ImageEmbeddingComponent } from 'src/app/image-embedding/image-embedding.component';
 import { TextEmbeddingComponent } from 'src/app/text-embedding/text-embedding.component';
@@ -15,21 +15,22 @@ import { MapComponent } from 'src/app/map/map.component';
 import { PolygonFilterService } from '../shared/services/polygon-filter.service';
 import { ApiService } from 'src/app/shared/api.service';
 import { AuthService } from '../shared/services/auth.service';
+import { ApiError, UserDataApiService, describeError } from '../shared/services/user-data-api.service';
 import { GlobalService } from 'src/app/shared/global.service';
 import { Query, StateQuery, InfoQuery } from '../shared/api.models';
+import { SavedState } from '../shared/models/state';
 import { UntypedFormGroup, UntypedFormControl, Validators} from '@angular/forms';
-import { ContextMenu, MenuItemModel, ContextMenuModel, MenuEventArgs } from '@syncfusion/ej2-navigations';
+import { ContextMenu, MenuItemModel, ContextMenuModel, MenuEventArgs, BeforeOpenCloseMenuEventArgs } from '@syncfusion/ej2-navigations';
 import { enableRipple } from '@syncfusion/ej2-base';
 import { NgxSpinnerService } from "ngx-spinner";
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { take } from 'rxjs';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements AfterViewInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   public modalRef: BsModalRef = new BsModalRef;
   public Query: Query = new Query();
   public EmbeddingQuery: Query = new Query();
@@ -51,9 +52,9 @@ export class HomeComponent implements AfterViewInit {
   public similarityValue = 80;
   public savedBuckets: any[] = [];
   public displayCombinedComponent: boolean = false;
-  private rightClickCount: number = 1;
-  private ctxMenuSavedBuckets: any = [];
-  private ctxMenuInUseBuckets: any = [];
+  private ctxMenuInUseBuckets?: ContextMenu;
+  private ctxMenuSavedBuckets?: ContextMenu;
+  private ctxMenuSavedStates?: ContextMenu;
 
   @ViewChild(ImageEmbeddingComponent, { static: true }) private imageEmbedding!:ImageEmbeddingComponent;
   @ViewChild(TextEmbeddingComponent, { static: true }) private textEmbedding!: TextEmbeddingComponent;
@@ -72,31 +73,28 @@ export class HomeComponent implements AfterViewInit {
               private spinner: NgxSpinnerService, 
               public authService: AuthService,
               public modalService: BsModalService,
-              private polygonFilter: PolygonFilterService) { }
-  
-  ngOnInit(): void {
+              private polygonFilter: PolygonFilterService,
+              private userData: UserDataApiService) { }
+
+  async ngOnInit(): Promise<void> {
     this.spinner.show();
-    const userCollectionData = localStorage.getItem('user_collection');
-  
-    if (userCollectionData && userCollectionData !== 'null') {
-      const userCollection = JSON.parse(userCollectionData);
-      this.bucket.userBuckets = userCollection.buckets || [];
-      this.state.savedStates = userCollection.states || [];
-      this.bucket.displayInUseBuckets();
-      this.bucket.displaySavedBuckets();
-    } else {
-      this.authService.userCollection.pipe(take(2)).subscribe((data: any) => {
-        if(Object.keys(data).length) {
-          this.bucket.bucketsInUse = [];
-          this.bucket.savedBuckets = [];
-          this.bucket.userBuckets = data.buckets;
-          this.state.savedStates = data.states;
-          this.bucket.displayInUseBuckets();
-          this.bucket.displaySavedBuckets();
-        }
-      });
+    try {
+      const collection = await this.userData.getCollection();
+      this.bucket.setAll(collection.buckets);
+      this.state.setList(collection.states);
+    } catch (e) {
+      if (e instanceof ApiError && e.code === 'not_signed_in') {
+        // the guard let us in on a stale localStorage 'user' (e.g. the session was revoked)
+        this.authService.router.navigate(['sign-in']);
+      } else {
+        alert(`Loading your buckets and states failed: ${describeError(e)}`);
+      }
+    } finally {
+      this.spinner.hide();
     }
   }
+
+  trackById = (_: number, item: { id: number }) => item.id;
 
   ngAfterViewInit(): void { 
 
@@ -156,12 +154,40 @@ export class HomeComponent implements AfterViewInit {
        };
       const Galleries: ContextMenu = new ContextMenu(menuOptionsGalleries, '#contextmenu-galleries')
 
-      setTimeout(() => {  
-        this.setAllBucketsMenu("first load");
-        this.setAllSavedStatesMenu();
-        this.spinner.hide();
-      },
-      2000);
+      this.createListMenus();
+  }
+
+  // one menu per list, bound to the static list container: items added later need no menu of their own
+  private createListMenus(): void {
+    const pick = (attr: string, set: (id: number) => void) => (args: BeforeOpenCloseMenuEventArgs) => {
+      const el = (args.event?.target as HTMLElement | null)?.closest(`[${attr}]`);
+      if (!el) {
+        args.cancel = true;
+        return;
+      }
+      set(Number(el.getAttribute(attr)));
+    };
+
+    this.ctxMenuInUseBuckets = new ContextMenu({
+      target: '#inuse-buckets-row',
+      items: [{ text: 'Save', id: 'save' }, { text: 'Delete', id: 'delete' }, { text: 'Close', id: 'close' }, { text: 'Image Gallery', id: 'gallery' }],
+      beforeOpen: pick('data-bucketid', id => this.bucket.lastRightClick = id),
+      select: this.onInUseBucketsChange.bind(this)
+    }, '#contextmenu-inuse-buckets');
+
+    this.ctxMenuSavedBuckets = new ContextMenu({
+      target: '#saved-buckets-list',
+      items: [{ text: 'Open', id: 'open' }, { text: 'Delete', id: 'delete' }, { text: 'Image Gallery', id: 'gallery' }],
+      beforeOpen: pick('data-bucketid', id => this.bucket.lastRightClick = id),
+      select: this.onSavedBucketsChange.bind(this)
+    }, '#contextmenu-saved-buckets');
+
+    this.ctxMenuSavedStates = new ContextMenu({
+      target: '#saved-states-list',
+      items: [{ text: 'Open', id: 'open' }, { text: 'Delete', id: 'delete' }],
+      beforeOpen: pick('data-stateid', id => this.state.lastRightClick = id),
+      select: this.onSavedStatesChange.bind(this)
+    }, '#contextmenu-saved-states');
   }
 
   async search() {
@@ -217,49 +243,54 @@ export class HomeComponent implements AfterViewInit {
 
   async embeddingsToState(idsAndSimilarities: number[][]) {
     this.spinner.show();
-    
-    if(idsAndSimilarities.length > 0) {
-      this.StateQuery.imagesIds = idsAndSimilarities[0];
-      this.StateQuery.imagesSimilarities = idsAndSimilarities[1];
-      this.StateQuery.textsIds = idsAndSimilarities[2];
-      this.StateQuery.textsSimilarities = idsAndSimilarities[3];
-      this.StateQuery.similarityValue = this.similarityValue;
-      this.onSelectionsClear();
-      
-      let res = await this.api.getState(this.StateQuery);
 
-      const currentNode = this.forceGraph.currentMainNode;
-      if (currentNode && currentNode.polygons && currentNode.polygons.length > 0) {
-        res = this.polygonFilter.applyPolygonFilter(res, currentNode.polygons);
-      }
-      
-      if(res.images.similarities.length > 0 && res.texts.similarities.length > 0) {
-        this.imageEmbedding.setupImageEmbedding(res.images);
-        this.textEmbedding.setupTextEmbedding(res.texts);
-        this.combinedEmbedding.setupCombinedEmbedding(res.images, res.texts);
-        this.imageGallery.updateImageGallery(res.images);
-        this.imageGallery.tabsCounter = 0;
-        this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
-        this.wordCloud.updateWordCloud(res.texts);
-        this.loadMapWithHeatmap(res.images);
-        
-        setTimeout(() => {
-          const currentNode = this.forceGraph.currentMainNode;
-          if (currentNode && currentNode.polygons && currentNode.polygons.length > 0) {
-            console.log(`Loading ${currentNode.polygons.length} polygons for node ${currentNode.id}`);
-            const polygonsCopy = JSON.parse(JSON.stringify(currentNode.polygons));
-            this.map.loadPolygons(polygonsCopy);
-          } else {
-            this.map.loadPolygons([]);
-          }
-        }, 300);
+    try {
+      if(idsAndSimilarities.length > 0) {
+        this.StateQuery.imagesIds = idsAndSimilarities[0];
+        this.StateQuery.imagesSimilarities = idsAndSimilarities[1];
+        this.StateQuery.textsIds = idsAndSimilarities[2];
+        this.StateQuery.textsSimilarities = idsAndSimilarities[3];
+        this.StateQuery.similarityValue = this.similarityValue;
+        this.onSelectionsClear();
+
+        let res = await this.api.getState(this.StateQuery);
+
+        const currentNode = this.forceGraph.currentMainNode;
+        if (currentNode && currentNode.polygons && currentNode.polygons.length > 0) {
+          res = this.polygonFilter.applyPolygonFilter(res, currentNode.polygons);
+        }
+
+        if(res.images.similarities.length > 0 && res.texts.similarities.length > 0) {
+          this.imageEmbedding.setupImageEmbedding(res.images);
+          this.textEmbedding.setupTextEmbedding(res.texts);
+          this.combinedEmbedding.setupCombinedEmbedding(res.images, res.texts);
+          this.imageGallery.updateImageGallery(res.images);
+          this.imageGallery.tabsCounter = 0;
+          this.coloLegend.updateColorLegend(res.texts.similarities, res.images.similarities);
+          this.wordCloud.updateWordCloud(res.texts);
+          this.loadMapWithHeatmap(res.images);
+
+          setTimeout(() => {
+            const currentNode = this.forceGraph.currentMainNode;
+            if (currentNode && currentNode.polygons && currentNode.polygons.length > 0) {
+              console.log(`Loading ${currentNode.polygons.length} polygons for node ${currentNode.id}`);
+              const polygonsCopy = JSON.parse(JSON.stringify(currentNode.polygons));
+              this.map.loadPolygons(polygonsCopy);
+            } else {
+              this.map.loadPolygons([]);
+            }
+          }, 300);
+        } else {
+          alert('Empty result')
+        }
       } else {
-        alert('Empty result')
+        this.resetAll();
       }
-    } else {
-      this.resetAll();
+    } catch (e) {
+      alert(`Loading the data for this node failed: ${describeError(e)}`);
+    } finally {
+      this.spinner.hide();
     }
-    this.spinner.hide();
   }
 
   async searchSelected(event: any) {
@@ -500,161 +531,55 @@ export class HomeComponent implements AfterViewInit {
     this.modalRef = this.modalService.show(template);
   }
 
-  onBucketCreate(bucketName: string) {
-    this.bucket.addBucket(bucketName);
+  async onBucketCreate(bucketName: string) {
+    if (await this.bucket.addBucket(bucketName)) this.modalRef.hide();
   }
 
-  onSaveState(stateName: string) {
-    let bool = false;
-    for(let i = 0; i  < this.state.savedStates.length; i++) {
-      if(stateName == this.state.savedStates[i].name) bool = true;
+  async onSaveState(stateName: string) {
+    const name = stateName.trim();
+    if (!name) {
+      alert('Please enter a name.');
+      return;
     }
-    if(bool) this.state.updateState(stateName, this.forceGraph.forceGraphData);
-    else this.state.saveState(stateName, this.forceGraph.forceGraphData);
+    if (await this.state.save(name, this.forceGraph.forceGraphData)) this.modalRef.hide();
   }
 
   onInUseBucketsChange(args: MenuEventArgs) {
+    const bucketId = this.bucket.lastRightClick;
     if(args.item.id == 'save') {
-      this.bucket.saveBucket(this.bucket.lastRightClick);
+      this.bucket.saveBucket(bucketId);
     } else if(args.item.id == 'close') {
-      this.bucket.closeBucket(this.bucket.lastRightClick);
-      document.getElementById("contextmenu-inusebucket-" + this.bucket.lastRightClick)!.remove();
+      this.bucket.closeBucket(bucketId);
     } else if(args.item.id == 'delete') {
-      this.bucket.destroyBucket(this.bucket.lastRightClick);
+      this.bucket.destroyBucket(bucketId);
     } else {
-      const bucketImages = this.bucket.getImages(this.bucket.lastRightClick,'inuse');
-      this.modalGallery.openModal(bucketImages);
+      this.modalGallery.openModal(this.bucket.getImageUrls(bucketId));
     }
   }
 
   onSavedBucketsChange(args: MenuEventArgs) {
+    const bucketId = this.bucket.lastRightClick;
     if(args.item.id == 'delete') {
-      this.bucket.destroyBucket(this.bucket.lastRightClick);
+      this.bucket.destroyBucket(bucketId);
     } else if(args.item.id == 'open') {
-      this.bucket.openUserBucket(this.bucket.lastRightClick);
+      this.bucket.openUserBucket(bucketId);
     } else {
-      if(!this.modalGallery.isModalOpen) {
-        const bucketImages = this.bucket.getImages(this.bucket.lastRightClick, 'saved');
-        this.modalGallery.openModal(bucketImages);        
-      } else {
-        console.log('modal already open')
-      }
+      this.modalGallery.openModal(this.bucket.getImageUrls(bucketId));
     }
   }
 
   onSavedStatesChange(args: MenuEventArgs) {
-    if(this.rightClickCount == 1) {
-      if(args.item.id == 'delete') {
-        this.state.destroyState(this.state.lastRightClick);
-      } else if(args.item.id == 'open') {
-        this.state.openState(this.state.lastRightClick);
-      }
-    }
-    this.rightClickCount = 0;    
-  }
-
-  setBucketsMenu(bucketId: number) {
-    const menuItemsBucket: MenuItemModel[] = [
-      {
-          text: 'Save',
-          id: 'save'
-      },
-      {
-          text: 'Delete',
-          id: 'delete'
-      }, {
-          text:  'Close',
-          id: 'close'
-      },{
-        text: 'Image Gallery',
-        id: 'gallery'
-      }];
-
-      let menuOptionsBucket: ContextMenuModel = {
-          target: '#inusebucket-div-' + bucketId,
-          items: menuItemsBucket,
-          select: this.onInUseBucketsChange.bind(this)
-      };
-
-      return new ContextMenu(menuOptionsBucket, '#contextmenu-inusebucket-' + bucketId);
-  }
-
-
-  setSavedBucketsMenu(bucketId: number) {
-    const menuItemsBucket: MenuItemModel[] = [
-      {
-        text:  'Open',
-        id: 'open'
-      },{
-        text: 'Delete',
-        id: 'delete'
-      },{
-        text: 'Image Gallery',
-        id: 'gallery'
-      }];
-      let menuOptionsBucket: ContextMenuModel = {
-          target: '#savedbucket-div-' + bucketId,
-          items: menuItemsBucket,
-          select: this.onSavedBucketsChange.bind(this)
-      };
-
-      return new ContextMenu(menuOptionsBucket, '#contextmenu-savedbucket-' + bucketId);
-  }
-
-  setSavedStatesMenu(stateId: number) {
-    const menuItemsState: MenuItemModel[] = [
-      {
-        text:  'Open',
-        id: 'open'
-      },{
-        text: 'Delete',
-        id: 'delete'
-      }];
-      let menuOptionsState: ContextMenuModel = {
-          target: '#state-div-' + stateId,
-          items: menuItemsState,
-          select: this.onSavedStatesChange.bind(this)
-      };
-
-    return new ContextMenu(menuOptionsState, '#contextmenu-state-' + stateId);
-  }
-
-
-  setAllBucketsMenu(from: string) {
-    if(from !== 'saving') {
-      for(let i = 0; i < this.bucket.bucketsInUse.length;  i++) {
-        this.setBucketsMenu(this.bucket.bucketsInUse[i].id);
-      }
-    }
-
-    for(let i = 0; i < this.bucket.savedBuckets.length;  i++) {
-      this.setSavedBucketsMenu(this.bucket.savedBuckets[i].id)
+    if(args.item.id == 'delete') {
+      this.state.destroyState(this.state.lastRightClick);
+    } else if(args.item.id == 'open') {
+      this.state.openState(this.state.lastRightClick);
     }
   }
 
-  setAllSavedStatesMenu() {
-    for(let i = 0; i < this.state.savedStates.length;  i++) {
-      this.setSavedStatesMenu(this.state.savedStates[i].id)
-    }
+  changeState(state: SavedState) {
+    this.forceGraph.openState(state);
   }
 
-  setFyToUndefined() {
-    this.forceGraph.forceGraphData.nodes.forEach((node: any) => {
-      node.fy = undefined;
-    });
-  }
-
-  changeState(state: any) {
-    if(state == -1) this.resetAll('reset');
-    else this.forceGraph.openState(state);
-  }
-
-  onRightClick(id: number, from: string) {
-    this.rightClickCount = 1;
-    if(from == 'bucket') this.bucket.lastRightClick = id;
-    else this.state.lastRightClick = id;
-  }
-  
   resetAll(from: string = 'node') {
     this.imageEmbedding.clear();
     this.textEmbedding.clear();
@@ -675,19 +600,11 @@ export class HomeComponent implements AfterViewInit {
     this.wordCloud.selectTexts(points);
   }
 
-  addImageToBucket(event: any) {
-    console.log(event)
-    console.log(this.imageGallery.selectedIndices)
-    if(this.bucket.bucketToDrop !== -1) {
-      if(this.imageGallery.selectedIndices.length > 0) {
-        for(let i = 0; i < this.imageGallery.selectedImagePaths.length; i++) {
-          this.bucket.addImage(this.bucket.bucketToDrop, this.imageGallery.selectedImagePaths[i]);
-        }
-      } else {
-        this.bucket.addImage(this.bucket.bucketToDrop, event);
-      }
-    }
-    this.bucket.bucketToDrop = -1; 
+  // files: dataset filenames of the dragged image, or of the whole selection it belongs to
+  addImageToBucket(files: string[]) {
+    const target = this.bucket.bucketToDrop;
+    this.bucket.bucketToDrop = -1;
+    if (target !== -1 && files.length) this.bucket.addImages(target, files);
   }
 
   async infoQuery (event: string) {

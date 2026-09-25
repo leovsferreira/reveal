@@ -1,5 +1,7 @@
 back/dataset/
 back/__pycache__
+back/userdata/
+__pycache__/
 node_modules/
 schema.xml
 case_study

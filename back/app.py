@@ -4,7 +4,6 @@ import os
 import torch
 import pandas as pd
 import numpy as np
-from flask_cors import CORS
 from utils import build_text_tokenizer, calculate_similarities, get_indices, build_tensors, get_torch_device, normalize_similarities, build_image_encoder, build_text_encoder
 from itertools import chain
 from flask import current_app
@@ -21,15 +20,17 @@ def load_texts_df(path='./dataset/files/unique_words_final.json'):
     return df
 
 IMAGES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dataset', 'llm')
-HOST = '0.0.0.0'
+HOST = os.environ.get('REVEAL_HOST', '127.0.0.1')
 PORT = 8001
 app = Flask(__name__)
+from persistence import init_app as init_persistence, init_cors
+init_persistence(app)
 app.image_encoder, app.image_preprocess = build_image_encoder()
 app.text_encoder = build_text_encoder()
 app.text_tokenizer = build_text_tokenizer()
 app.torch_device = get_torch_device()
 
-CORS(app)
+init_cors(app)
 
 @app.route('/dataset/llm/<folder>/<path:filename>')
 def serve_image(folder, filename):

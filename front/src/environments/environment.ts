@@ -9,6 +9,7 @@ import { getAnalytics } from "firebase/analytics";
 export const environment = {
   production: false,
   imagesUrl: "http://localhost:8001/dataset/llm",
+  apiUrl: "http://localhost:8001",
   firebase: {
     apiKey: keys.firebaseApiKey,
     authDomain: "projeto-mestrado-cb1e0.firebaseapp.com",

@@ -4,6 +4,7 @@ import { LightGallery } from 'lightgallery/lightgallery';
 import lgZoom from 'lightgallery/plugins/zoom';
 import lgThumbnail from 'lightgallery/plugins/thumbnail';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { imageFileFromUrl } from '../shared/image-ref';
 
 @Component({
   selector: 'app-image-gallery',
@@ -18,13 +19,12 @@ export class ImageGalleryComponent implements OnInit {
 
   @Output() toggleImage = new EventEmitter<any>();
   @Output() gallerySearchSelected = new EventEmitter<any>();
-  @Output() dropImage = new EventEmitter<any>();
+  @Output() dropImage = new EventEmitter<string[]>();
   @Output() getInfo = new EventEmitter<any>();
 
   private lightGallery!: LightGallery;
   private needRefresh = false;
   public selectedIndices: number[] = [];
-  public selectedImagePaths: string[] = [];
   private allImages: any[] = [];
   
   private batchSize = 50; 
@@ -38,7 +38,6 @@ export class ImageGalleryComponent implements OnInit {
     licenseKey: 'DCD313B0-6D77495F-A570ED6F-3C6C65ED'
   };
   public items:any = [];
-  public draggedImageUrl: any;
   public modalRef: BsModalRef = new BsModalRef;
   public template: any;
   public info: string = "";
@@ -68,8 +67,8 @@ export class ImageGalleryComponent implements OnInit {
       const images = document.querySelectorAll('.grid-item img');
       for(let i = 0; i < images.length; i++) { 
         images[i].addEventListener('dragend', (event:any) => {
-          this.draggedImageUrl = event.target.src.replace('http://localhost:4200','.')
-          this.dropImage.emit(this.draggedImageUrl);
+          const dragged = imageFileFromUrl(event.target?.src);
+          if (dragged) this.dropImage.emit(this.filesForDrag(dragged));
         });
       }
     }
@@ -85,17 +84,17 @@ export class ImageGalleryComponent implements OnInit {
     this.allImages = [];
     this.items = [];
     this.selectedIndices = [];
-    this.selectedImagePaths = [];
 
     const similarities = data.similarities;
     const paths = data.labelPaths;
     const ids = data.labels;
-    
+
     for(let i = 0; i < paths.length; i++) {
       this.allImages.push({
         src: `${environment.imagesUrl}/processed/${paths[i]}`,
-        thumb: `${environment.imagesUrl}/thumbnails/${paths[i]}`, 
-        id: ids[i], 
+        thumb: `${environment.imagesUrl}/thumbnails/${paths[i]}`,
+        file: Array.isArray(paths[i]) ? paths[i][0] : paths[i],
+        id: ids[i],
         index: i, 
         width: 80, 
         height: 80, 
@@ -149,19 +148,13 @@ export class ImageGalleryComponent implements OnInit {
 
       if(!this.selectedIndices.includes(id)) {
         this.selectedIndices.push(id);
-        this.selectedImagePaths.push(event.target.currentSrc);
-        
+
         targetImage.border = 'solid';
         targetImage.borderColor = "#00FF00";
         targetImage.borderWidth = "3px";
       } else {
         const selectedItemIndex = this.selectedIndices.indexOf(id);
         this.selectedIndices.splice(selectedItemIndex, 1);
-        
-        const selectedImagePathsIndex = this.selectedImagePaths.indexOf(event.target.currentSrc);
-        if (selectedImagePathsIndex > -1) {
-            this.selectedImagePaths.splice(selectedImagePathsIndex, 1);
-        }
 
         targetImage.border = 'none';
         targetImage.borderColor = "";
@@ -174,7 +167,6 @@ export class ImageGalleryComponent implements OnInit {
 
   selectImages(points: any) {
     this.selectedIndices = [];
-    this.selectedImagePaths = [];
 
     for(let i = 0; i < this.allImages.length; i++) {
       this.allImages[i].border = 'none';
@@ -191,6 +183,13 @@ export class ImageGalleryComponent implements OnInit {
       }
     }
     
+  }
+
+  // dragging a selected image (Ctrl-click or lasso) drags the whole selection; an unselected one drags only itself
+  filesForDrag(dragged: string): string[] {
+    const selected = new Set(this.selectedIndices);
+    const files = this.allImages.filter((img: any) => selected.has(img.id)).map((img: any) => String(img.file));
+    return files.includes(dragged) ? files : [dragged];
   }
 
   updateTabCounter(value: number) {
@@ -212,7 +211,6 @@ export class ImageGalleryComponent implements OnInit {
     this.items = [];
     this.allImages = [];
     this.selectedIndices = [];
-    this.selectedImagePaths = [];
     this.hasMoreImages = false;
   }
 

@@ -3,6 +3,7 @@ import { PolygonFilterService } from '../shared/services/polygon-filter.service'
 import { GlobalService } from 'src/app/shared/global.service';
 import { ApiService } from 'src/app/shared/api.service';
 import { BuildSetQuery } from '../shared/api.models';
+import { SavedState } from '../shared/models/state';
 import ForceGraph from 'force-graph';
 import * as d3 from "d3";
 
@@ -415,7 +416,7 @@ export class ForceGraphComponent implements OnInit {
 
 
 
-  openState(state: any) {
+  openState(state: SavedState) {
     this.resetAll.emit();
     state.nodes.forEach((node: any) => {
       node.fy = undefined;
@@ -424,7 +425,7 @@ export class ForceGraphComponent implements OnInit {
     this.forceGraph.graphData({nodes: state.nodes, links: state.links});
     if(state.nodes.length > 0) {
       const node = state.nodes[state.nodes.length - 1];
-      const lastNodeId = state.nodes[state.nodes.length - 1].id + 1
+      const lastNodeId = Math.max(...state.nodes.map((n: any) => n.id)) + 1;
       this.schema.number_of_queries = lastNodeId;
       this.nodeId = lastNodeId;
       this.parentNode.add(node)
