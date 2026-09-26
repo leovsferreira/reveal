@@ -4,11 +4,10 @@
 
 export const HEATMAP_CELL_ZOOM = 15; // cells of ~910 m at Chicago's latitude
 
-const PIXELS_PER_CELL = 8;
+const PIXELS_PER_CELL = 9; // odd, so a pixel lands on each cell center and the densest cell gets the top color
 const MAX_CANVAS_SIZE = 2048;
 const MAX_GRID_SIZE = 1024; // the grid is only coarsened when the points span too large an area for one image
 const MAX_MERCATOR_LAT = 85.051129;
-const EARTH_CIRCUMFERENCE_M = 40075016.686;
 
 // Same color scale as the previous MapLibre heatmap-color ramp (count / max count -> color)
 const COLOR_STOPS: [number, [number, number, number, number]][] = [
@@ -19,10 +18,6 @@ const COLOR_STOPS: [number, [number, number, number, number]][] = [
   [0.8,  [227, 74, 51, 255]],
   [1,    [179, 0, 0, 255]]
 ];
-
-export const HEATMAP_LEGEND_GRADIENT = 'linear-gradient(to right, ' + COLOR_STOPS
-  .map(([t, [r, g, b, a]]) => `rgba(${r}, ${g}, ${b}, ${a / 255}) ${t * 100}%`)
-  .join(', ') + ')';
 
 // 256-step lookup table, like the ramp texture MapLibre samples for heatmap-color
 const COLOR_RAMP = (() => {
@@ -43,8 +38,6 @@ export interface GridHeatmap {
   url: string;
   // top-left, top-right, bottom-right, bottom-left, as MapLibre image sources expect
   coordinates: [[number, number], [number, number], [number, number], [number, number]];
-  maxCount: number;
-  cellMeters: number;
 }
 
 export function buildGridHeatmap(locations: { lon: number, lat: number }[]): GridHeatmap | null {
@@ -120,12 +113,9 @@ export function buildGridHeatmap(locations: { lon: number, lat: number }[]): Gri
   const east = (x0 + cols) / n * 360 - 180;
   const north = Math.atan(Math.sinh(Math.PI * (1 - 2 * y0 / n))) * 180 / Math.PI;
   const south = Math.atan(Math.sinh(Math.PI * (1 - 2 * (y0 + rows) / n))) * 180 / Math.PI;
-  const centerLat = Math.atan(Math.sinh(Math.PI * (1 - (minY + maxY))));
 
   return {
     url: canvas.toDataURL('image/png'),
-    coordinates: [[west, north], [east, north], [east, south], [west, south]],
-    maxCount,
-    cellMeters: EARTH_CIRCUMFERENCE_M * Math.cos(centerLat) / n
+    coordinates: [[west, north], [east, north], [east, south], [west, south]]
   };
 }

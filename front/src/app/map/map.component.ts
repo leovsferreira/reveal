@@ -2,7 +2,7 @@ import { environment } from 'src/environments/environment';
 import { Component, AfterViewInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import * as maplibregl from 'maplibre-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import { buildGridHeatmap, GridHeatmap, HEATMAP_LEGEND_GRADIENT } from './grid-heatmap';
+import { buildGridHeatmap, GridHeatmap } from './grid-heatmap';
 
 // the heatmap is hidden from this zoom on, where the individual points take over
 const HEATMAP_MAX_ZOOM = 15;
@@ -48,9 +48,7 @@ export class MapComponent implements AfterViewInit {
 
   private selectionMarkers: maplibregl.Marker[] = [];
   private heatmapData: any = null;
-  public heatmapGrid: GridHeatmap | null = null;
-  public heatmapInView = true;
-  public heatmapLegendGradient = HEATMAP_LEGEND_GRADIENT;
+  private heatmapGrid: GridHeatmap | null = null;
   private locationIndexMap: Map<number, { lon: number, lat: number }> = new Map();
 
   private isDrawingMode = false;
@@ -101,15 +99,15 @@ export class MapComponent implements AfterViewInit {
       touchPitch: true
     });
 
-    this.map.on('zoom', () => {
-      this.heatmapInView = this.map.getZoom() < HEATMAP_MAX_ZOOM;
-    });
-
     this.map.on('load', () => {
       console.log('Map load event fired');
 
       this.map.resize();
-      
+
+      // the OSM/CARTO credit is required, but may collapse to its (i) button after five seconds (MapLibre only does it on drag)
+      const map = this.map;
+      setTimeout(() => map.getContainer().querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show'), 5000);
+
       if (this.heatmapData) {
         console.log('Adding heatmap from pending data');
         this.addHeatmapLayer();
