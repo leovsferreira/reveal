@@ -2,6 +2,10 @@ import { environment } from 'src/environments/environment';
 import { Component, AfterViewInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import * as maplibregl from 'maplibre-gl';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import { buildGridHeatmap, GridHeatmap, HEATMAP_LEGEND_GRADIENT } from './grid-heatmap';
+
+// the heatmap is hidden from this zoom on, where the individual points take over
+const HEATMAP_MAX_ZOOM = 15;
 
 // mapbox-gl-draw looks for Mapbox's class names (e.g. to handle Enter/Escape/Delete on the canvas); use MapLibre's
 Object.assign(MapboxDraw.constants.classes, {
@@ -44,6 +48,9 @@ export class MapComponent implements AfterViewInit {
 
   private selectionMarkers: maplibregl.Marker[] = [];
   private heatmapData: any = null;
+  public heatmapGrid: GridHeatmap | null = null;
+  public heatmapInView = true;
+  public heatmapLegendGradient = HEATMAP_LEGEND_GRADIENT;
   private locationIndexMap: Map<number, { lon: number, lat: number }> = new Map();
 
   private isDrawingMode = false;
@@ -92,6 +99,10 @@ export class MapComponent implements AfterViewInit {
       doubleClickZoom: true,
       touchZoomRotate: true,
       touchPitch: true
+    });
+
+    this.map.on('zoom', () => {
+      this.heatmapInView = this.map.getZoom() < HEATMAP_MAX_ZOOM;
     });
 
     this.map.on('load', () => {
@@ -326,6 +337,7 @@ export class MapComponent implements AfterViewInit {
       type: 'FeatureCollection',
       features: features
     };
+    this.heatmapGrid = buildGridHeatmap(locations);
     
     console.log('Heatmap data prepared:', this.heatmapData);
     
@@ -360,21 +372,7 @@ export class MapComponent implements AfterViewInit {
 
     console.log('Adding heatmap layer with', this.heatmapData.features.length, 'points');
 
-    if (this.map.getLayer('heatmap-layer')) {
-      this.map.removeLayer('heatmap-layer');
-    }
-    if (this.map.getLayer('heatmap-point')) {
-      this.map.removeLayer('heatmap-point');
-    }
-    if (this.map.getSource('heatmap-source')) {
-      this.map.removeSource('heatmap-source');
-    }
-
-    this.map.addSource('heatmap-source', {
-      type: 'geojson',
-      data: this.heatmapData
-    });
-    console.log('Heatmap source added');
+    this.removeHeatmapLayers();
 
     const layers = this.map.getStyle().layers;
     let firstSymbolId: string | undefined;
@@ -388,59 +386,36 @@ export class MapComponent implements AfterViewInit {
       }
     }
 
-    this.map.addLayer({
-      id: 'heatmap-layer',
-      type: 'heatmap',
-      source: 'heatmap-source',
-      maxzoom: 15,
-      paint: {
-        'heatmap-weight': 0.05, 
+    if (this.heatmapGrid) {
+      this.map.addSource('heatmap-source', {
+        type: 'image',
+        url: this.heatmapGrid.url,
+        coordinates: this.heatmapGrid.coordinates
+      });
 
-        'heatmap-intensity': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          0, 1,
-          15, 3
-        ],
+      this.map.addLayer({
+        id: 'heatmap-layer',
+        type: 'raster',
+        source: 'heatmap-source',
+        maxzoom: HEATMAP_MAX_ZOOM,
+        paint: {
+          'raster-opacity': 0.8,
+          'raster-fade-duration': 0
+        }
+      }, firstSymbolId);
 
-        'heatmap-color': [
-          'interpolate',
-          ['linear'],
-          ['heatmap-density'],
-          0,    'rgba(254, 240, 217, 0)', 
-          0.05, '#fef0d9', 
-          0.3,  '#fdcc8a',
-          0.5,  '#fc8d59',
-          0.8,  '#e34a33',
-          1,    '#b30000'
-        ],
+      console.log('Heatmap layer added' + (firstSymbolId ? ' before ' + firstSymbolId : ''));
+    }
 
-        'heatmap-radius': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          0, 2,
-          15, 20 
-        ],
-
-        'heatmap-opacity': [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          7, 1,
-          15, 0.7
-        ]
-      }
-    }, firstSymbolId);
-
-
-    console.log('Heatmap layer added' + (firstSymbolId ? ' before ' + firstSymbolId : ''));
+    this.map.addSource('heatmap-point-source', {
+      type: 'geojson',
+      data: this.heatmapData
+    });
 
     this.map.addLayer({
       id: 'heatmap-point',
       type: 'circle',
-      source: 'heatmap-source',
+      source: 'heatmap-point-source',
       minzoom: 13,
       paint: {
         'circle-radius': [
@@ -465,7 +440,24 @@ export class MapComponent implements AfterViewInit {
     console.log('Heatmap point layer added');
   }
 
+  private removeHeatmapLayers(): void {
+    if (this.map.getLayer('heatmap-layer')) {
+      this.map.removeLayer('heatmap-layer');
+    }
+    if (this.map.getLayer('heatmap-point')) {
+      this.map.removeLayer('heatmap-point');
+    }
+    if (this.map.getSource('heatmap-source')) {
+      this.map.removeSource('heatmap-source');
+    }
+    if (this.map.getSource('heatmap-point-source')) {
+      this.map.removeSource('heatmap-point-source');
+    }
+  }
+
   private clearHeatmap(): void {
+    this.heatmapGrid = null;
+
     if (!this.mapInitialized || !this.map) {
       console.log('Cannot clear heatmap - map not initialized');
       this.heatmapData = null;
@@ -475,15 +467,7 @@ export class MapComponent implements AfterViewInit {
     console.log('Clearing heatmap layers');
 
     try {
-      if (this.map.getLayer('heatmap-layer')) {
-        this.map.removeLayer('heatmap-layer');
-      }
-      if (this.map.getLayer('heatmap-point')) {
-        this.map.removeLayer('heatmap-point');
-      }
-      if (this.map.getSource('heatmap-source')) {
-        this.map.removeSource('heatmap-source');
-      }
+      this.removeHeatmapLayers();
     } catch (error) {
       console.error('Error clearing heatmap:', error);
     }

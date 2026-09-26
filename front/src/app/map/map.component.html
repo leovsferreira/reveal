@@ -25,4 +25,13 @@
       <i class="fas fa-trash"></i>
     </button>
   </div>
+
+  <div *ngIf="heatmapGrid && heatmapInView" class="heatmap-legend">
+    <div class="heatmap-legend-title">Images per cell (~{{ heatmapGrid.cellMeters | number:'1.0-0' }} m)</div>
+    <div class="heatmap-legend-bar" [style.background]="heatmapLegendGradient"></div>
+    <div class="heatmap-legend-labels">
+      <span>0</span>
+      <span>{{ heatmapGrid.maxCount }}</span>
+    </div>
+  </div>
 </div>
